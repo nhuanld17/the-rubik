@@ -1,0 +1,233 @@
+# Rubik's Cube - C++98 & FreeGLUT Project Rules
+
+## Project Context
+You are helping build a 3D interactive Rubik's Cube (3x3x3) using C++98 and FreeGLUT library for a Computer Graphics course final project.
+
+## CURRENT PROJECT STATUS - PHASE 1 COMPLETED ✅
+
+### Phase 1: Basic OpenGL Window with Camera Controls (COMPLETED)
+- ✅ OpenGL window setup (800x600, dark gray background)
+- ✅ Single colored cube rendering (6 different colors: Red, Orange, Green, Blue, White, Yellow)
+- ✅ Arcball/trackball mouse camera control (drag to rotate)
+- ✅ Keyboard arrow keys control (UP/DOWN/LEFT/RIGHT to rotate)
+- ✅ Unlimited rotation (no clamping, full 360° rotation)
+- ✅ Debug logging to file (rubik_debug.log)
+- ✅ Proper lighting setup for cube visibility
+
+### Current File Structure
+```
+project_root/
+├── main.cpp              # Single file implementation (Phase 1)
+├── rubik_debug.log       # Debug log file (auto-generated)
+├── rubik.exe             # Compiled executable
+├── .cursorrules          # This file
+└── Makefile.win          # Build configuration
+```
+
+### Current Implementation Details
+
+**Global Variables:**
+- `windowWidth = 800`, `windowHeight = 600`
+- `cameraAngleX`, `cameraAngleY` (rotation angles in degrees)
+- `isDragging`, `lastMouseX`, `lastMouseY` (mouse tracking)
+- `g_logFile` (FILE* for debug logging)
+
+**Constants:**
+- `ROTATION_SENSITIVITY = 0.3f` (mouse drag sensitivity)
+- `KEYBOARD_ROTATION_SPEED = 5.0f` (degrees per arrow key press)
+- `CAMERA_DISTANCE = 8.0f` (camera distance from origin)
+
+**Functions Implemented:**
+- `initLogFile()` - Initialize debug log file with timestamp
+- `closeLogFile()` - Close log file on exit
+- `clampAngle()` - Utility function (currently not used for unlimited rotation)
+- `initOpenGL()` - Setup OpenGL (depth test, lighting, clear color)
+- `drawCube()` - Draw single cube with 6 colored faces using GL_QUADS
+- `display()` - Main render loop with camera transformations
+- `reshape()` - Handle window resize, setup perspective projection (FOV=45°)
+- `mouse()` - Handle mouse button press/release (left button drag)
+- `motion()` - Handle mouse drag (arcball camera rotation)
+- `keyboard()` - Handle arrow keys (UP/DOWN/LEFT/RIGHT for rotation)
+- `main()` - GLUT initialization and main loop
+
+**Camera Control:**
+- Mouse drag: Left button drag to rotate camera around cube
+  - Horizontal drag → Yaw rotation (around Y-axis)
+  - Vertical drag → Pitch rotation (around X-axis)
+  - Rotation order: Yaw FIRST, then Pitch (for intuitive control)
+- Keyboard: Arrow keys for rotation
+  - UP → Look up (decrease pitch)
+  - DOWN → Look down (increase pitch)
+  - LEFT → Rotate left (decrease yaw)
+  - RIGHT → Rotate right (increase yaw)
+
+**Cube Rendering:**
+- Single cube at origin (size 1.0x1.0x1.0)
+- 6 faces with different colors:
+  - Front (Z+): RED (1.0, 0.0, 0.0)
+  - Back (Z-): ORANGE (1.0, 0.5, 0.0)
+  - Right (X+): GREEN (0.0, 1.0, 0.0)
+  - Left (X-): BLUE (0.0, 0.0, 1.0)
+  - Top (Y+): WHITE (1.0, 1.0, 1.0)
+  - Bottom (Y-): YELLOW (1.0, 1.0, 0.0)
+- Proper normals for lighting
+- Uses GL_QUADS with glBegin/glEnd
+
+**Debug Logging:**
+- All mouse events logged to `rubik_debug.log`
+- All keyboard events logged
+- Mouse movement deltas and angle updates logged
+- Display frame info logged every 30 frames
+- Timestamp in log header
+
+**Issues Fixed:**
+- ✅ Mouse Y-coordinate inversion fixed (UP/DOWN direction correct)
+- ✅ Rotation order fixed (Yaw before Pitch for intuitive control)
+- ✅ Unlimited rotation (removed clamp to allow full 360° rotation)
+- ✅ Console window pause fix (Windows system("pause"))
+- ✅ PowerShell compile command syntax fixed
+
+## C++98 Strict Compliance
+- MUST use C++98 standard ONLY - no C++11/14/17/20 features
+- NO auto keyword, nullptr, range-based for loops, lambda functions
+- NO std::array, std::unique_ptr, std::shared_ptr
+- Use NULL instead of nullptr
+- Use typedef instead of using
+- Use std::vector, std::string from STL when needed
+- All variables must be declared at the beginning of scope
+
+## Code Style & Naming Conventions
+- camelCase for variables and functions: `rotationAngle`, `updateCubePosition()`
+- PascalCase for classes/structs: `CubePiece`, `RubikCube`
+- ALL_CAPS for constants and macros: `CUBE_SIZE`, `ROTATION_SPEED`
+- snake_case for file names: `rubik_cube.cpp`, `cube_renderer.h`
+- Prefix member variables with `m_`: `m_position`, `m_color`
+
+## Planned File Structure (Future Phases)
+project_root/
+├── src/
+│ ├── main.cpp # Entry point, GLUT initialization
+│ ├── rubik_cube.cpp/h # Rubik cube logic & data structure
+│ ├── renderer.cpp/h # OpenGL rendering functions
+│ ├── controls.cpp/h # Keyboard/mouse input handling
+│ └── utils.cpp/h # Helper functions, math utilities
+├── .cursorrules
+└── Makefile or CMakeLists.txt
+
+## OpenGL & FreeGLUT Guidelines
+- Use legacy OpenGL (fixed pipeline) - glBegin/glEnd, glVertex3f
+- Use GLUT primitives: glutSolidCube(), glutWireCube() when appropriate
+- Always check OpenGL errors after critical calls
+- Use glPushMatrix/glPopMatrix for transformation isolation
+- Apply transformations in order: Translate → Rotate → Scale
+- Use glLoadIdentity() before each frame rendering
+- Implement proper lighting with glEnable(GL_LIGHTING), glLightfv()
+- Current implementation uses: GL_LIGHT0 with ambient and diffuse lighting
+
+## Rubik's Cube Implementation Rules (Future Phases)
+- Represent cube as 3x3x3 array of CubePiece structures
+- Each piece tracks: position (x,y,z), orientation, 6 face colors
+- Use enums for faces: FRONT, BACK, LEFT, RIGHT, UP, DOWN
+- Standard colors: White=U, Yellow=D, Red=F, Orange=B, Green=R, Blue=L
+- Rotation functions must update BOTH position AND face colors
+- Implement rotation matrix (90° increments) for face transformations
+- Use animation state machine: IDLE → ROTATING → IDLE
+
+## Code Organization
+- Separate logic from rendering: cube state vs. visual representation
+- Keep functions small (<50 lines) and single-purpose
+- Use meaningful function names: `rotateFaceClockwise()` not `rot()`
+- Group related functions: all rotation logic together
+- Minimize global variables - use class/struct members
+- Current Phase 1 uses global variables (will refactor in future phases)
+
+## Error Handling & Validation
+- Check GLUT initialization success
+- Validate user input (key presses, mouse coordinates)
+- Prevent rotation input during animation (future)
+- Add assertions for array bounds checking (future)
+- Current: Log file error handling (warns if cannot open log file)
+
+## Comments & Documentation
+- Comment WHAT and WHY, not HOW (code should be self-explanatory)
+- Document complex math operations (rotation matrices, transformations)
+- Add header comments for each file: purpose, author, date
+- Document public functions with brief description, params, return value
+- Use `//` for single line, `/* */` for multi-line comments
+- Current: Comprehensive comments explaining arcball math and coordinate systems
+
+## Performance Considerations
+- Minimize state changes in render loop
+- Use display lists (glGenLists, glCallList) for repeated geometry (future)
+- Avoid dynamic memory allocation in render loop
+- Pre-calculate constant values (colors, vertices)
+- Current: Simple immediate mode rendering (sufficient for Phase 1)
+
+## Build Instructions
+
+### Windows (MinGW - PowerShell)
+```powershell
+# Compile
+g++ -std=c++98 -Wall -Wextra -O2 main.cpp -lfreeglut -lopengl32 -lglu32 -o rubik.exe
+
+# One-line compile + run
+g++ -std=c++98 -Wall -Wextra -O2 main.cpp -lfreeglut -lopengl32 -lglu32 -o rubik.exe; if ($?) { .\rubik.exe }
+
+# Or separate commands
+g++ -std=c++98 -Wall -Wextra -O2 main.cpp -lfreeglut -lopengl32 -lglu32 -o rubik.exe
+.\rubik.exe
+```
+
+### Linux
+```bash
+g++ -std=c++98 -Wall -Wextra -O2 main.cpp -lglut -lGLU -lGL -lm -o rubik
+./rubik
+```
+
+### Important Notes
+- When generating build commands for Windows/MinGW, ALWAYS link with:
+  `-lopengl32 -lfreeglut -lglu32` (do NOT use `-lGL`, `-lGLU`, `-lglut` on Windows).
+- Optionally, if include/lib paths are needed, add:
+  `-I<path_to_freeglut_include> -L<path_to_freeglut_lib>` before the source files.
+
+### Required Libraries
+- FreeGLUT
+- OpenGL (`opengl32` on Windows, `GL` on Linux)
+- GLU (`glu32` on Windows, `GLU` on Linux)
+
+## Response Format
+- Provide complete, compilable code snippets
+- Include necessary `#include` statements
+- Show example usage after function definitions
+- Explain complex algorithms step-by-step in Vietnamese
+- Highlight C++98 constraints when relevant
+
+## Testing & Debugging
+- Suggest printf debugging for transformation tracking
+- Provide test cases for rotation logic
+- Recommend visual debugging (draw axes, wireframes)
+- Current: Comprehensive debug logging to file (rubik_debug.log)
+- Log includes: mouse events, keyboard events, angle updates, frame info
+
+## Don't Do
+- Don't use modern C++ features (post-C++98)
+- Don't mix rendering and logic in same function
+- Don't hardcode magic numbers - use named constants
+- Don't ignore compilation warnings
+- Don't overcomplicate - keep solutions simple and readable
+
+## Known Issues & Future Improvements
+- Current: Single cube only (Phase 1)
+- Future: Implement 3x3x3 Rubik's Cube structure
+- Future: Implement face rotation mechanics
+- Future: Implement animation system
+- Future: Refactor into multiple files (src/ structure)
+- Future: Add more keyboard shortcuts for cube manipulation
+- Future: Add reset/randomize functions
+
+## Debug Logging Details
+- Log file: `rubik_debug.log` (auto-created in project root)
+- Log format: Text file with timestamps
+- Logs: Mouse events, keyboard events, angle changes, frame info
+- Log rotation: Overwrites on each run (mode "w")
+- To change to append mode: Change `fopen("rubik_debug.log", "w")` to `"a"` in `initLogFile()`
