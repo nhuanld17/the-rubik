@@ -995,22 +995,10 @@ void initOpenGL() {
     // Enable smooth shading
     glShadeModel(GL_SMOOTH);
     
-    // Enable lighting (basic setup for better cube visibility)
-    glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    
-    // Set up light properties
-    GLfloat lightPosition[] = {5.0f, 5.0f, 5.0f, 1.0f};
-    GLfloat lightAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
-    GLfloat lightDiffuse[] = {0.8f, 0.8f, 0.8f, 1.0f};
-    
-    glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightDiffuse);
-    
-    // Enable color material so glColor3f works with lighting
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+    // Disable OpenGL lighting so cube colors stay flat and matching textures
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+    glDisable(GL_COLOR_MATERIAL);
 }
 
 // Draw a single cube piece with 6 custom colors
