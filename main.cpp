@@ -1366,6 +1366,15 @@ void initOpenGL() {
     // Enable depth testing for 3D rendering
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
+
+#ifdef GL_MULTISAMPLE
+    glEnable(GL_MULTISAMPLE);
+#endif
+    glEnable(GL_LINE_SMOOTH);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glLineWidth(1.5f);
     
     // Set clear color to dark gray
     glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
@@ -2115,8 +2124,12 @@ int main(int argc, char** argv) {
     // Initialize GLUT
     glutInit(&argc, argv);
     
-    // Set display mode: double buffer + RGB color + depth buffer
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    // Set display mode: double buffer + RGB color + depth buffer (+ multisample if available)
+    unsigned int displayMode = GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH;
+#ifdef GLUT_MULTISAMPLE
+    displayMode |= GLUT_MULTISAMPLE;
+#endif
+    glutInitDisplayMode(displayMode);
     
     // Set window size and position
     glutInitWindowSize(windowWidth, windowHeight);
