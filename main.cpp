@@ -48,6 +48,10 @@
 #include <cstring> // for memcpy
 #include <cctype>  // for toupper
 
+#if defined(_MSC_VER) && !defined(snprintf)
+#define snprintf _snprintf
+#endif
+
 // Window dimensions
 int windowWidth = 800;
 int windowHeight = 600;
@@ -107,12 +111,6 @@ struct RubikCube {
 RubikCube g_rubikCube;
 
 // Animation state (for future use)
-bool isAnimating = false;
-
-// Input debouncing for face rotations
-const double FACE_DEBOUNCE_MS = 120.0; // minimum gap between identical face commands
-double g_lastFaceCommandMs[12] = {0.0}; // 6 faces x (CW, CCW)
-
 // Face orientation enum
 enum Face {
     FRONT = 0,  // Red
@@ -122,6 +120,95 @@ enum Face {
     UP = 4,     // White
     DOWN = 5    // Yellow
 };
+
+const float ROTATION_SPEED_DEG_PER_SEC = 360.0f;
+const int MOVE_QUEUE_CAPACITY = 20;
+
+struct RotationAnimation {
+    bool isActive;
+    Face face;
+    bool clockwise;
+    bool isScrambleMove;
+    float currentAngle;
+    float targetAngle;
+    float speed;
+    float displayAngle;
+    int affectedIndices[9];
+};
+
+struct MoveQueue {
+    int moves[MOVE_QUEUE_CAPACITY];
+    bool dirs[MOVE_QUEUE_CAPACITY];
+    bool scrambleFlags[MOVE_QUEUE_CAPACITY];
+    int count;
+    int head;
+};
+
+RotationAnimation g_animation = {
+    false,
+    FRONT,
+    true,
+    false,
+    0.0f,
+    90.0f,
+    ROTATION_SPEED_DEG_PER_SEC,
+    0.0f,
+    {-1, -1, -1, -1, -1, -1, -1, -1, -1}
+};
+
+MoveQueue g_moveQueue = {{0}, {false}, {false}, 0, 0};
+int g_lastTimeMs = 0;
+bool g_keyHeld[256] = {false};
+
+enum TimerState {
+    TIMER_IDLE = 0,
+    TIMER_READY,
+    TIMER_RUNNING,
+    TIMER_STOPPED
+};
+
+struct SpeedTimer {
+    TimerState state;
+    float startTime;
+    float endTime;
+    int moveCount;
+    float currentTime;
+    float tps;
+    float lastSampleTime;
+};
+
+SpeedTimer g_timer = {TIMER_IDLE, 0.0f, 0.0f, 0, 0.0f, 0.0f, 0.0f};
+int g_scrambleMovesPending = 0;
+
+void resetTimerState() {
+    g_timer.state = TIMER_IDLE;
+    g_timer.startTime = 0.0f;
+    g_timer.endTime = 0.0f;
+    g_timer.moveCount = 0;
+    g_timer.currentTime = 0.0f;
+    g_timer.tps = 0.0f;
+    g_timer.lastSampleTime = 0.0f;
+}
+
+void armTimerForSolve() {
+    g_timer.state = TIMER_READY;
+    g_timer.startTime = 0.0f;
+    g_timer.endTime = 0.0f;
+    g_timer.moveCount = 0;
+    g_timer.currentTime = 0.0f;
+    g_timer.tps = 0.0f;
+    g_timer.lastSampleTime = 0.0f;
+}
+
+void handleScrambleMoveCompletion(bool wasScrambleMove) {
+    if (!wasScrambleMove || g_scrambleMovesPending <= 0) {
+        return;
+    }
+    g_scrambleMovesPending--;
+    if (g_scrambleMovesPending == 0) {
+        armTimerForSolve();
+    }
+}
 
 // Current front face orientation
 Face currentFrontFace = FRONT;
@@ -477,6 +564,23 @@ void resetRotationAngles() {
 // Forward declarations
 void initRubikCube();
 void rotatePieceOrientation(int pieceIndex, int axis, bool clockwise);
+Face getAbsoluteFace(int relativeFace);
+void rotateFace(int face, bool clockwise);
+void startRotation(Face face, bool clockwise, bool isScrambleMove = false);
+void updateAnimation(float deltaTime);
+bool isPieceInAnimation(int pieceIndex);
+float easeInOutCubic(float t);
+void idle();
+void cancelAnimationAndQueue();
+void keyboardUp(unsigned char key, int x, int y);
+void onMoveStarted();
+bool isCubeSolved();
+void updateTimer();
+void resetTimerState();
+void armTimerForSolve();
+void handleScrambleMoveCompletion(bool wasScrambleMove);
+void renderBitmapString(float x, float y, void* font, const char* string);
+void displayTimerOverlay();
 
 // Convert position (i,j,k) to array index
 // Loop order: k=1,0,-1; j=-1,0,1; i=-1,0,1
@@ -908,29 +1012,253 @@ void rotateColors(int face, bool clockwise) {
     (void)clockwise;
 }
 
-// Forward declarations for face helpers defined later in the file
-Face getAbsoluteFace(int relativeFace);
-void rotateFace(int face, bool clockwise);
+float easeInOutCubic(float t) {
+    if (t < 0.0f) {
+        t = 0.0f;
+    } else if (t > 1.0f) {
+        t = 1.0f;
+    }
+    if (t < 0.5f) {
+        return 4.0f * t * t * t;
+    }
+    float f = (2.0f * t) - 2.0f;
+    return 0.5f * f * f * f + 1.0f;
+}
 
-bool performRelativeFaceTurn(int relativeFace, bool clockwise) {
-    double nowMs = getLogTimestampMs();
-    int index = relativeFace + (clockwise ? 0 : 6);
-    double lastMs = g_lastFaceCommandMs[index];
-    if (lastMs > 0.0 && (nowMs - lastMs) < FACE_DEBOUNCE_MS) {
-        if (g_logFile != NULL) {
-            fprintf(g_logFile,
-                    "[%010.3f ms] INPUT DROPPED: REL FACE %d %s (delta=%.3f ms)\n",
-                    nowMs,
-                    relativeFace,
-                    clockwise ? "CW" : "CCW",
-                    nowMs - lastMs);
-            fflush(g_logFile);
-        }
+bool isPieceInAnimation(int pieceIndex) {
+    if (!g_animation.isActive) {
         return false;
     }
-    g_lastFaceCommandMs[index] = nowMs;
-    rotateFace(getAbsoluteFace(relativeFace), clockwise);
+    for (int i = 0; i < 9; i++) {
+        if (g_animation.affectedIndices[i] == pieceIndex) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void cancelAnimationAndQueue() {
+    g_animation.isActive = false;
+    g_animation.isScrambleMove = false;
+    g_animation.currentAngle = 0.0f;
+    g_animation.displayAngle = 0.0f;
+    for (int i = 0; i < 9; i++) {
+        g_animation.affectedIndices[i] = -1;
+    }
+    g_moveQueue.count = 0;
+    g_moveQueue.head = 0;
+    for (int i = 0; i < MOVE_QUEUE_CAPACITY; i++) {
+        g_moveQueue.scrambleFlags[i] = false;
+    }
+}
+
+bool dequeueQueuedMove(Face& face, bool& clockwise, bool& isScrambleMove) {
+    if (g_moveQueue.count == 0) {
+        return false;
+    }
+    int idx = g_moveQueue.head;
+    face = static_cast<Face>(g_moveQueue.moves[idx]);
+    clockwise = g_moveQueue.dirs[idx];
+    isScrambleMove = g_moveQueue.scrambleFlags[idx];
+    g_moveQueue.scrambleFlags[idx] = false;
+    g_moveQueue.head = (g_moveQueue.head + 1) % MOVE_QUEUE_CAPACITY;
+    g_moveQueue.count--;
+    if (g_moveQueue.count == 0) {
+        g_moveQueue.head = 0;
+    }
+    return true;
+}
+
+void startRotation(Face face, bool clockwise, bool isScrambleMove) {
+    if (face < FRONT || face > DOWN) {
+        return;
+    }
+    if (g_animation.isActive) {
+        if (g_moveQueue.count >= MOVE_QUEUE_CAPACITY) {
+            if (g_logFile != NULL) {
+                const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+                double tsMs = getLogTimestampMs();
+                fprintf(g_logFile, "[%010.3f ms] QUEUE FULL: drop %s %s\n",
+                        tsMs,
+                        faceNames[face],
+                        clockwise ? "CW" : "CCW");
+                fflush(g_logFile);
+            }
+        } else {
+            int idx = (g_moveQueue.head + g_moveQueue.count) % MOVE_QUEUE_CAPACITY;
+            g_moveQueue.moves[idx] = static_cast<int>(face);
+            g_moveQueue.dirs[idx] = clockwise;
+            g_moveQueue.scrambleFlags[idx] = isScrambleMove;
+            g_moveQueue.count++;
+            if (g_logFile != NULL) {
+                const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+                double tsMs = getLogTimestampMs();
+                fprintf(g_logFile, "[%010.3f ms] ANIM QUEUED %s %s | queue=%d\n",
+                        tsMs,
+                        faceNames[face],
+                        clockwise ? "CW" : "CCW",
+                        g_moveQueue.count);
+                fflush(g_logFile);
+            }
+        }
+        return;
+    }
+    onMoveStarted();
+    g_animation.isActive = true;
+    g_animation.face = face;
+    g_animation.clockwise = clockwise;
+    g_animation.isScrambleMove = isScrambleMove;
+    g_animation.currentAngle = 0.0f;
+    g_animation.displayAngle = 0.0f;
+    g_animation.targetAngle = 90.0f;
+    g_animation.speed = ROTATION_SPEED_DEG_PER_SEC;
+    getFaceIndices(face, g_animation.affectedIndices);
+    if (g_logFile != NULL) {
+        const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+        double tsMs = getLogTimestampMs();
+        fprintf(g_logFile, "[%010.3f ms] ANIM START %s %s | queue=%d\n",
+                tsMs,
+                faceNames[face],
+                clockwise ? "CW" : "CCW",
+                g_moveQueue.count);
+        fflush(g_logFile);
+    }
     glutPostRedisplay();
+}
+
+void updateAnimation(float deltaTime) {
+    if (!g_animation.isActive) {
+        return;
+    }
+    g_animation.currentAngle += g_animation.speed * deltaTime;
+    if (g_animation.currentAngle > g_animation.targetAngle) {
+        g_animation.currentAngle = g_animation.targetAngle;
+    }
+    float progress = (g_animation.targetAngle > 0.0f)
+        ? (g_animation.currentAngle / g_animation.targetAngle)
+        : 1.0f;
+    if (progress > 1.0f) {
+        progress = 1.0f;
+    }
+    g_animation.displayAngle = easeInOutCubic(progress) * g_animation.targetAngle;
+    if (g_animation.currentAngle >= g_animation.targetAngle - 0.0001f) {
+        Face finishedFace = g_animation.face;
+        bool finishedDir = g_animation.clockwise;
+        bool finishedWasScramble = g_animation.isScrambleMove;
+        rotateFace(finishedFace, finishedDir);
+        g_animation.isActive = false;
+        g_animation.isScrambleMove = false;
+        g_animation.currentAngle = 0.0f;
+        g_animation.displayAngle = 0.0f;
+        for (int i = 0; i < 9; i++) {
+            g_animation.affectedIndices[i] = -1;
+        }
+        if (g_logFile != NULL) {
+            const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+            double tsMs = getLogTimestampMs();
+            fprintf(g_logFile, "[%010.3f ms] ANIM END %s %s | queue=%d\n",
+                    tsMs,
+                    faceNames[finishedFace],
+                    finishedDir ? "CW" : "CCW",
+                    g_moveQueue.count);
+            fflush(g_logFile);
+        }
+        handleScrambleMoveCompletion(finishedWasScramble);
+        Face nextFace;
+        bool nextDir;
+        bool nextIsScramble = false;
+        if (dequeueQueuedMove(nextFace, nextDir, nextIsScramble)) {
+            startRotation(nextFace, nextDir, nextIsScramble);
+        }
+    }
+    glutPostRedisplay();
+}
+
+void onMoveStarted() {
+    if (g_timer.state == TIMER_READY) {
+        g_timer.state = TIMER_RUNNING;
+        g_timer.startTime = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+        g_timer.lastSampleTime = g_timer.startTime;
+        g_timer.moveCount = 0;
+        g_timer.currentTime = 0.0f;
+        g_timer.tps = 0.0f;
+        if (g_logFile != NULL) {
+            fprintf(g_logFile, "TIMER STARTED\n");
+            fflush(g_logFile);
+        }
+    }
+    if (g_timer.state == TIMER_RUNNING) {
+        g_timer.moveCount++;
+    }
+}
+
+bool isCubeSolved() {
+    const float tolerance = 0.05f;
+    int indices[9];
+    for (int face = 0; face < 6; face++) {
+        getFaceIndices(face, indices);
+        const float* centerColor = g_rubikCube.pieces[indices[4]].colors[face];
+        for (int i = 0; i < 9; i++) {
+            const float* sticker = g_rubikCube.pieces[indices[i]].colors[face];
+            float diff = fabs(sticker[0] - centerColor[0]) +
+                        fabs(sticker[1] - centerColor[1]) +
+                        fabs(sticker[2] - centerColor[2]);
+            if (diff > tolerance) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+void updateTimer() {
+    if (g_timer.state != TIMER_RUNNING) {
+        return;
+    }
+    float now = (float)glutGet(GLUT_ELAPSED_TIME) / 1000.0f;
+    g_timer.currentTime = now - g_timer.startTime;
+    g_timer.lastSampleTime = now;
+    if (g_timer.currentTime < 0.0f) {
+        g_timer.currentTime = 0.0f;
+    }
+    if (g_timer.currentTime > 0.0f) {
+        g_timer.tps = (float)g_timer.moveCount / g_timer.currentTime;
+    }
+    if (!g_animation.isActive && isCubeSolved()) {
+        g_timer.state = TIMER_STOPPED;
+        g_timer.endTime = g_timer.currentTime;
+        if (g_logFile != NULL) {
+            fprintf(g_logFile, "========================================\n");
+            fprintf(g_logFile, "CUBE SOLVED!\n");
+            fprintf(g_logFile, "Time: %.2f seconds\n", g_timer.endTime);
+            fprintf(g_logFile, "Moves: %d\n", g_timer.moveCount);
+            fprintf(g_logFile, "TPS: %.2f\n", g_timer.tps);
+            fprintf(g_logFile, "========================================\n");
+            fflush(g_logFile);
+        }
+    }
+    glutPostRedisplay();
+}
+
+void idle() {
+    int currentTime = glutGet(GLUT_ELAPSED_TIME);
+    if (g_lastTimeMs == 0) {
+        g_lastTimeMs = currentTime;
+    }
+    float deltaTime = (float)(currentTime - g_lastTimeMs) / 1000.0f;
+    if (deltaTime > 0.1f) {
+        deltaTime = 0.1f;
+    } else if (deltaTime < 0.0f) {
+        deltaTime = 0.0f;
+    }
+    g_lastTimeMs = currentTime;
+    updateAnimation(deltaTime);
+    updateTimer();
+}
+
+bool performRelativeFaceTurn(int relativeFace, bool clockwise) {
+    Face absoluteFace = getAbsoluteFace(relativeFace);
+    startRotation(absoluteFace, clockwise);
     return true;
 }
 
@@ -969,10 +1297,6 @@ Face getAbsoluteFace(int relativeFace) {
 
 // Main face rotation function
 void rotateFace(int face, bool clockwise) {
-    if (isAnimating) {
-        return;
-    }
-    
     int indices[9];
     getFaceIndices(face, indices);
     
@@ -1006,7 +1330,10 @@ void rotateFace(int face, bool clockwise) {
 
 // Reset cube to solved state
 void resetCube() {
+    cancelAnimationAndQueue();
     initRubikCube();
+    g_scrambleMovesPending = 0;
+    resetTimerState();
     if (g_logFile != NULL) {
         fprintf(g_logFile, "RESET: Cube to solved state\n");
         fflush(g_logFile);
@@ -1015,18 +1342,18 @@ void resetCube() {
 
 // Shuffle cube with random moves
 void shuffleCube(int numMoves) {
-    int i;
-    int face;
-    bool clockwise;
-    
-    for (i = 0; i < numMoves; i++) {
-        face = rand() % 6;
-        clockwise = (rand() % 2) == 0;
-        rotateFace(face, clockwise);
+    if (numMoves <= 0) {
+        return;
     }
-    
+    resetTimerState();
+    g_scrambleMovesPending = numMoves;
+    for (int i = 0; i < numMoves; i++) {
+        Face face = static_cast<Face>(rand() % 6);
+        bool clockwise = (rand() % 2) == 0;
+        startRotation(face, clockwise, true);
+    }
     if (g_logFile != NULL) {
-        fprintf(g_logFile, "SHUFFLE: %d random moves\n", numMoves);
+        fprintf(g_logFile, "SHUFFLE: %d random moves queued\n", numMoves);
         fflush(g_logFile);
     }
 }
@@ -1223,7 +1550,44 @@ void drawRubikCube() {
         // Save current matrix
         glPushMatrix();
         
-        // Translate to piece position
+        bool pieceAnimating = g_animation.isActive && isPieceInAnimation(i);
+        if (pieceAnimating) {
+            float axisX = 0.0f;
+            float axisY = 0.0f;
+            float axisZ = 0.0f;
+            int axisSign = 1;
+            switch (g_animation.face) {
+                case FRONT:
+                    axisZ = 1.0f;
+                    axisSign = 1;
+                    break;
+                case BACK:
+                    axisZ = 1.0f;
+                    axisSign = -1;
+                    break;
+                case LEFT:
+                    axisX = 1.0f;
+                    axisSign = -1;
+                    break;
+                case RIGHT:
+                    axisX = 1.0f;
+                    axisSign = 1;
+                    break;
+                case UP:
+                    axisY = 1.0f;
+                    axisSign = 1;
+                    break;
+                case DOWN:
+                    axisY = 1.0f;
+                    axisSign = -1;
+                    break;
+            }
+            float angle = g_animation.clockwise ? -g_animation.displayAngle : g_animation.displayAngle;
+            angle *= static_cast<float>(axisSign);
+            glRotatef(angle, axisX, axisY, axisZ);
+        }
+        
+        // Translate to piece position after optional face rotation so the whole layer pivots together
         glTranslatef(worldX, worldY, worldZ);
         
         // Draw the piece with its colors
@@ -1234,6 +1598,89 @@ void drawRubikCube() {
     }
     
     glPopMatrix();
+}
+
+void renderBitmapString(float x, float y, void* font, const char* string) {
+    glRasterPos2f(x, y);
+    while (*string != '\0') {
+        glutBitmapCharacter(font, *string);
+        ++string;
+    }
+}
+
+void formatTimerText(float seconds, char* buffer, int bufferSize) {
+    if (seconds < 0.0f) {
+        seconds = 0.0f;
+    }
+    int minutes = (int)(seconds / 60.0f);
+    float sec = seconds - minutes * 60.0f;
+    if (bufferSize > 0) {
+        snprintf(buffer, bufferSize, "%02d:%06.3f", minutes, sec);
+    }
+}
+
+void displayTimerOverlay() {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    gluOrtho2D(0.0f, (float)windowWidth, 0.0f, (float)windowHeight);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    GLboolean depthEnabled = glIsEnabled(GL_DEPTH_TEST);
+    GLboolean lightingEnabled = glIsEnabled(GL_LIGHTING);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    char buffer[128];
+    if (g_scrambleMovesPending > 0) {
+        glColor3f(1.0f, 0.6f, 0.0f);
+        snprintf(buffer, sizeof(buffer), "Scrambling... (%d moves left)", g_scrambleMovesPending);
+        renderBitmapString(10.0f, windowHeight - 20.0f, GLUT_BITMAP_HELVETICA_18, buffer);
+        renderBitmapString(10.0f, windowHeight - 40.0f, GLUT_BITMAP_HELVETICA_18,
+                           "Please wait for scramble to finish");
+    } else {
+        switch (g_timer.state) {
+            case TIMER_IDLE:
+                glColor3f(1.0f, 1.0f, 1.0f);
+                renderBitmapString(10.0f, windowHeight - 20.0f, GLUT_BITMAP_HELVETICA_18,
+                                   "Press 'S' to scramble");
+                break;
+            case TIMER_READY:
+                glColor3f(1.0f, 1.0f, 0.2f);
+                renderBitmapString(10.0f, windowHeight - 20.0f, GLUT_BITMAP_HELVETICA_18,
+                                   "READY - Make first move to start");
+                break;
+            case TIMER_RUNNING:
+                glColor3f(0.0f, 1.0f, 0.0f);
+                formatTimerText(g_timer.currentTime, buffer, sizeof(buffer));
+                renderBitmapString(10.0f, windowHeight - 20.0f, GLUT_BITMAP_HELVETICA_18,
+                                   buffer);
+                snprintf(buffer, sizeof(buffer), "Moves: %d", g_timer.moveCount);
+                renderBitmapString(10.0f, windowHeight - 40.0f, GLUT_BITMAP_HELVETICA_18,
+                                   buffer);
+                snprintf(buffer, sizeof(buffer), "TPS: %.2f", g_timer.tps);
+                renderBitmapString(10.0f, windowHeight - 60.0f, GLUT_BITMAP_HELVETICA_18,
+                                   buffer);
+                break;
+            case TIMER_STOPPED:
+                glColor3f(0.2f, 1.0f, 0.2f);
+                snprintf(buffer, sizeof(buffer), "Solved! Time %.2fs | Moves %d | TPS %.2f",
+                         g_timer.endTime, g_timer.moveCount, g_timer.tps);
+                renderBitmapString(windowWidth * 0.2f, windowHeight * 0.5f,
+                                   GLUT_BITMAP_HELVETICA_18, buffer);
+                break;
+        }
+    }
+    if (depthEnabled) {
+        glEnable(GL_DEPTH_TEST);
+    }
+    if (lightingEnabled) {
+        glEnable(GL_LIGHTING);
+    }
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
 }
 
 // Main display function - renders the scene
@@ -1262,6 +1709,7 @@ void display() {
     
     // Draw the complete 3x3x3 Rubik's Cube
     drawRubikCube();
+    displayTimerOverlay();
     
     // Swap buffers to display the rendered frame
     glutSwapBuffers();
@@ -1390,7 +1838,32 @@ void motion(int x, int y) {
 void keyboard(unsigned char key, int /* x */, int /* y */) {
     int modifiers = glutGetModifiers();
     bool shiftDown = (modifiers & GLUT_ACTIVE_SHIFT) != 0;
-    int keyUpper = toupper(key);
+    int keyUpper = toupper((unsigned char)key);
+    bool trackKey = false;
+    switch (keyUpper) {
+        case 'F':
+        case 'U':
+        case 'R':
+        case 'L':
+        case 'D':
+        case 'B':
+        case 'S':
+            trackKey = true;
+            break;
+        default:
+            break;
+    }
+    if (key == ' ') {
+        trackKey = true;
+        keyUpper = ' ';
+    }
+    if (trackKey) {
+        unsigned char idx = (unsigned char)keyUpper;
+        if (g_keyHeld[idx]) {
+            return;
+        }
+        g_keyHeld[idx] = true;
+    }
     Face newFace = currentFrontFace;
     bool faceChanged = false;
     
@@ -1505,6 +1978,17 @@ void keyboard(unsigned char key, int /* x */, int /* y */) {
         currentFrontFace = newFace;
         updateRotationAxes();
         glutPostRedisplay();
+    }
+}
+
+void keyboardUp(unsigned char key, int /* x */, int /* y */) {
+    int keyUpper = toupper((unsigned char)key);
+    if (keyUpper < 0 || keyUpper >= 256) {
+        return;
+    }
+    g_keyHeld[(unsigned char)keyUpper] = false;
+    if (key == ' ') {
+        g_keyHeld[(unsigned char)' '] = false;
     }
 }
 
@@ -1662,8 +2146,11 @@ int main(int argc, char** argv) {
     glutMouseFunc(mouse);
     glutMotionFunc(motion);
     glutKeyboardFunc(keyboard);      // Register keyboard handler for regular keys (F/R/B/L/U/D)
+    glutKeyboardUpFunc(keyboardUp);
     glutSpecialFunc(keyboardSpecial); // Register keyboard handler for special keys (arrow keys)
+    glutIdleFunc(idle);
     glutIgnoreKeyRepeat(1);           // Disable key auto-repeat so each press logs once
+    g_lastTimeMs = glutGet(GLUT_ELAPSED_TIME);
     
     // Log initialization complete
     if (g_logFile != NULL) {
