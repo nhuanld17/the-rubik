@@ -267,9 +267,9 @@ struct ViewFaceMapping {
 };
 
 void applyCurrentViewRotation(float& x, float& y, float& z) {
-    // Apply rotations in the same order as display(): horizontal (yaw) first, then vertical (pitch)
-    rotateVectorAroundAxis(horizontalAxis, cameraAngleY, x, y, z);
-    rotateVectorAroundAxis(verticalAxis, cameraAngleX, x, y, z);
+    // Apply rotations in the same *effect* order as display() to match OpenGL's right-to-left matrix multiply
+    rotateVectorAroundAxis(verticalAxis, cameraAngleX, x, y, z);   // display()'s second glRotate executes first on geometry
+    rotateVectorAroundAxis(horizontalAxis, cameraAngleY, x, y, z); // then yaw around the horizontal axis
 }
 
 void computeViewFaceMapping(ViewFaceMapping& mapping) {
@@ -282,36 +282,87 @@ void computeViewFaceMapping(ViewFaceMapping& mapping) {
         {0.0f, -1.0f, 0.0f}   // DOWN
     };
     const Face faces[6] = {FRONT, BACK, LEFT, RIGHT, UP, DOWN};
-    float bestZ = -1000.0f;
-    float bestY = -1000.0f;
-    float bestX = -1000.0f;
-    Face frontFace = FRONT;
-    Face upFace = UP;
-    Face rightFace = RIGHT;
+    float rotated[6][3];
     for (int i = 0; i < 6; i++) {
-        float vx = normals[i][0];
-        float vy = normals[i][1];
-        float vz = normals[i][2];
-        applyCurrentViewRotation(vx, vy, vz);
-        if (vz > bestZ) {
-            bestZ = vz;
-            frontFace = faces[i];
-        }
-        if (vy > bestY) {
-            bestY = vy;
-            upFace = faces[i];
-        }
-        if (vx > bestX) {
-            bestX = vx;
-            rightFace = faces[i];
+        rotated[i][0] = normals[i][0];
+        rotated[i][1] = normals[i][1];
+        rotated[i][2] = normals[i][2];
+        applyCurrentViewRotation(rotated[i][0], rotated[i][1], rotated[i][2]);
+    }
+    float bestFrontDot = -1000.0f;
+    float bestUpDot = -1000.0f;
+    int frontIdx = 0;
+    int upIdx = 4;
+    const float viewFront[3] = {0.0f, 0.0f, 1.0f};
+    const float viewUp[3] = {0.0f, 1.0f, 0.0f};
+    for (int i = 0; i < 6; i++) {
+        float dotFront = rotated[i][0] * viewFront[0] + rotated[i][1] * viewFront[1] + rotated[i][2] * viewFront[2];
+        if (dotFront > bestFrontDot) {
+            bestFrontDot = dotFront;
+            frontIdx = i;
         }
     }
-    mapping.front = frontFace;
-    mapping.back = getOppositeFace(frontFace);
-    mapping.up = upFace;
-    mapping.down = getOppositeFace(upFace);
-    mapping.right = rightFace;
-    mapping.left = getOppositeFace(rightFace);
+    for (int i = 0; i < 6; i++) {
+        if (i == frontIdx || faces[i] == getOppositeFace(faces[frontIdx])) {
+            continue;
+        }
+        float dotUp = rotated[i][0] * viewUp[0] + rotated[i][1] * viewUp[1] + rotated[i][2] * viewUp[2];
+        if (dotUp > bestUpDot) {
+            bestUpDot = dotUp;
+            upIdx = i;
+        }
+    }
+    float frontVec[3] = {rotated[frontIdx][0], rotated[frontIdx][1], rotated[frontIdx][2]};
+    float upVec[3] = {rotated[upIdx][0], rotated[upIdx][1], rotated[upIdx][2]};
+    // Ensure upVec is orthogonal to frontVec
+    float frontDotUp = frontVec[0] * upVec[0] + frontVec[1] * upVec[1] + frontVec[2] * upVec[2];
+    if (fabs(frontDotUp) > 0.9f) {
+        // Choose another candidate for up
+        bestUpDot = -1000.0f;
+        for (int i = 0; i < 6; i++) {
+            if (i == frontIdx || faces[i] == getOppositeFace(faces[frontIdx])) {
+                continue;
+            }
+            float dotUp = rotated[i][0] * viewUp[0] + rotated[i][1] * viewUp[1] + rotated[i][2] * viewUp[2];
+            if (dotUp > bestUpDot && fabs(rotated[i][0] * frontVec[0] + rotated[i][1] * frontVec[1] + rotated[i][2] * frontVec[2]) < 0.1f) {
+                bestUpDot = dotUp;
+                upIdx = i;
+                upVec[0] = rotated[i][0];
+                upVec[1] = rotated[i][1];
+                upVec[2] = rotated[i][2];
+            }
+        }
+    }
+    // Compute right vector via cross product (up × front) to maintain a right-handed basis
+    float rightVec[3];
+    rightVec[0] = upVec[1] * frontVec[2] - upVec[2] * frontVec[1];
+    rightVec[1] = upVec[2] * frontVec[0] - upVec[0] * frontVec[2];
+    rightVec[2] = upVec[0] * frontVec[1] - upVec[1] * frontVec[0];
+    float rightLen = sqrt(rightVec[0] * rightVec[0] + rightVec[1] * rightVec[1] + rightVec[2] * rightVec[2]);
+    if (rightLen > 0.0001f) {
+        rightVec[0] /= rightLen;
+        rightVec[1] /= rightLen;
+        rightVec[2] /= rightLen;
+    } else {
+        rightVec[0] = 1.0f;
+        rightVec[1] = 0.0f;
+        rightVec[2] = 0.0f;
+    }
+    int rightIdx = 3;
+    float bestRightDot = -1000.0f;
+    for (int i = 0; i < 6; i++) {
+        float dotRight = rotated[i][0] * rightVec[0] + rotated[i][1] * rightVec[1] + rotated[i][2] * rightVec[2];
+        if (dotRight > bestRightDot) {
+            bestRightDot = dotRight;
+            rightIdx = i;
+        }
+    }
+    mapping.front = faces[frontIdx];
+    mapping.back = getOppositeFace(mapping.front);
+    mapping.up = faces[upIdx];
+    mapping.down = getOppositeFace(mapping.up);
+    mapping.right = faces[rightIdx];
+    mapping.left = getOppositeFace(mapping.right);
 }
 
 // Update rotation axes based on current front face
