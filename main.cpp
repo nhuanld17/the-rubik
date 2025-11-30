@@ -63,6 +63,7 @@ int lastMouseY = 0;
 
 // Debug log file
 FILE* g_logFile = NULL;
+clock_t g_logStartClock = 0; // used to compute relative timestamps
 
 // Rotation sensitivity (adjust for smooth control)
 const float ROTATION_SENSITIVITY = 0.3f;
@@ -108,6 +109,10 @@ RubikCube g_rubikCube;
 // Animation state (for future use)
 bool isAnimating = false;
 
+// Input debouncing for face rotations
+const double FACE_DEBOUNCE_MS = 120.0; // minimum gap between identical face commands
+double g_lastFaceCommandMs[12] = {0.0}; // 6 faces x (CW, CCW)
+
 // Face orientation enum
 enum Face {
     FRONT = 0,  // Red
@@ -133,6 +138,7 @@ void initLogFile() {
         std::cerr << "Warning: Cannot open log file rubik_debug.log" << std::endl;
         return;
     }
+    g_logStartClock = clock();
     
     // Write header with timestamp
     time_t rawTime;
@@ -147,6 +153,14 @@ void initLogFile() {
     fprintf(g_logFile, "Started: %s\n", timeStr);
     fprintf(g_logFile, "==============================\n\n");
     fflush(g_logFile);
+}
+
+double getLogTimestampMs() {
+    if (g_logStartClock == 0) {
+        return 0.0;
+    }
+    clock_t current = clock();
+    return (double)(current - g_logStartClock) * 1000.0 / CLOCKS_PER_SEC;
 }
 
 // Close log file
@@ -214,6 +228,90 @@ void axisAngleToMatrix(float m[3][3], const float axis[3], float angleDegrees) {
     m[2][0] = t * x * z - s * y;
     m[2][1] = t * y * z + s * x;
     m[2][2] = t * z * z + c;
+}
+
+void rotateVectorAroundAxis(const float axis[3], float angleDegrees,
+                            float& x, float& y, float& z) {
+    if (fabs(angleDegrees) < 0.0001f) {
+        return;
+    }
+    float rot[3][3];
+    axisAngleToMatrix(rot, axis, angleDegrees);
+    float rx = rot[0][0] * x + rot[0][1] * y + rot[0][2] * z;
+    float ry = rot[1][0] * x + rot[1][1] * y + rot[1][2] * z;
+    float rz = rot[2][0] * x + rot[2][1] * y + rot[2][2] * z;
+    x = rx;
+    y = ry;
+    z = rz;
+}
+
+Face getOppositeFace(Face face) {
+    switch (face) {
+        case FRONT: return BACK;
+        case BACK: return FRONT;
+        case LEFT: return RIGHT;
+        case RIGHT: return LEFT;
+        case UP: return DOWN;
+        case DOWN: return UP;
+        default: return FRONT;
+    }
+}
+
+struct ViewFaceMapping {
+    Face front;
+    Face back;
+    Face left;
+    Face right;
+    Face up;
+    Face down;
+};
+
+void applyCurrentViewRotation(float& x, float& y, float& z) {
+    // Apply rotations in the same order as display(): horizontal (yaw) first, then vertical (pitch)
+    rotateVectorAroundAxis(horizontalAxis, cameraAngleY, x, y, z);
+    rotateVectorAroundAxis(verticalAxis, cameraAngleX, x, y, z);
+}
+
+void computeViewFaceMapping(ViewFaceMapping& mapping) {
+    const float normals[6][3] = {
+        {0.0f, 0.0f, 1.0f},   // FRONT
+        {0.0f, 0.0f, -1.0f},  // BACK
+        {-1.0f, 0.0f, 0.0f},  // LEFT
+        {1.0f, 0.0f, 0.0f},   // RIGHT
+        {0.0f, 1.0f, 0.0f},   // UP
+        {0.0f, -1.0f, 0.0f}   // DOWN
+    };
+    const Face faces[6] = {FRONT, BACK, LEFT, RIGHT, UP, DOWN};
+    float bestZ = -1000.0f;
+    float bestY = -1000.0f;
+    float bestX = -1000.0f;
+    Face frontFace = FRONT;
+    Face upFace = UP;
+    Face rightFace = RIGHT;
+    for (int i = 0; i < 6; i++) {
+        float vx = normals[i][0];
+        float vy = normals[i][1];
+        float vz = normals[i][2];
+        applyCurrentViewRotation(vx, vy, vz);
+        if (vz > bestZ) {
+            bestZ = vz;
+            frontFace = faces[i];
+        }
+        if (vy > bestY) {
+            bestY = vy;
+            upFace = faces[i];
+        }
+        if (vx > bestX) {
+            bestX = vx;
+            rightFace = faces[i];
+        }
+    }
+    mapping.front = frontFace;
+    mapping.back = getOppositeFace(frontFace);
+    mapping.up = upFace;
+    mapping.down = getOppositeFace(upFace);
+    mapping.right = rightFace;
+    mapping.left = getOppositeFace(rightFace);
 }
 
 // Update rotation axes based on current front face
@@ -759,35 +857,63 @@ void rotateColors(int face, bool clockwise) {
     (void)clockwise;
 }
 
+// Forward declarations for face helpers defined later in the file
+Face getAbsoluteFace(int relativeFace);
+void rotateFace(int face, bool clockwise);
+
+bool performRelativeFaceTurn(int relativeFace, bool clockwise) {
+    double nowMs = getLogTimestampMs();
+    int index = relativeFace + (clockwise ? 0 : 6);
+    double lastMs = g_lastFaceCommandMs[index];
+    if (lastMs > 0.0 && (nowMs - lastMs) < FACE_DEBOUNCE_MS) {
+        if (g_logFile != NULL) {
+            fprintf(g_logFile,
+                    "[%010.3f ms] INPUT DROPPED: REL FACE %d %s (delta=%.3f ms)\n",
+                    nowMs,
+                    relativeFace,
+                    clockwise ? "CW" : "CCW",
+                    nowMs - lastMs);
+            fflush(g_logFile);
+        }
+        return false;
+    }
+    g_lastFaceCommandMs[index] = nowMs;
+    rotateFace(getAbsoluteFace(relativeFace), clockwise);
+    glutPostRedisplay();
+    return true;
+}
+
 // Convert relative face (F/U/R/L/D/B) to absolute face based on current front face
 // Relative faces: F=Front, U=Up, R=Right, L=Left, D=Down, B=Back (relative to current view)
 Face getAbsoluteFace(int relativeFace) {
-    // relativeFace: 0=F, 1=U, 2=R, 3=L, 4=D, 5=B
-    // Returns: absolute Face enum (FRONT/BACK/LEFT/RIGHT/UP/DOWN)
-    
-    // Mapping table: [currentFrontFace][relativeFace] -> absoluteFace
-    // Format: [FRONT, BACK, LEFT, RIGHT, UP, DOWN][F, U, R, L, D, B]
-    static const Face faceMapping[6][6] = {
-        // currentFrontFace = FRONT (Red front, White up, Yellow down)
-        {FRONT, UP, RIGHT, LEFT, DOWN, BACK},  // F, U, R, L, D, B
-        
-        // currentFrontFace = BACK (Orange front, White up, Yellow down)
-        {BACK, UP, LEFT, RIGHT, DOWN, FRONT},  // F, U, R, L, D, B
-        
-        // currentFrontFace = LEFT (Blue front, White up, Yellow down)
-        {LEFT, UP, FRONT, BACK, DOWN, RIGHT},   // F, U, R, L, D, B
-        
-        // currentFrontFace = RIGHT (Green front, White up, Yellow down)
-        {RIGHT, UP, BACK, FRONT, DOWN, LEFT},   // F, U, R, L, D, B
-        
-        // currentFrontFace = UP (White front, Red right, Orange left)
-        {UP, BACK, RIGHT, LEFT, FRONT, DOWN},   // F, U, R, L, D, B
-        
-        // currentFrontFace = DOWN (Yellow front, Orange right, Red left)
-        {DOWN, FRONT, RIGHT, LEFT, BACK, UP}    // F, U, R, L, D, B
-    };
-    
-    return faceMapping[currentFrontFace][relativeFace];
+    ViewFaceMapping mapping;
+    computeViewFaceMapping(mapping);
+    Face selected = mapping.front;
+    switch (relativeFace) {
+        case 0: selected = mapping.front; break;
+        case 1: selected = mapping.up; break;
+        case 2: selected = mapping.right; break;
+        case 3: selected = mapping.left; break;
+        case 4: selected = mapping.down; break;
+        case 5: selected = mapping.back; break;
+        default: selected = mapping.front; break;
+    }
+    if (g_logFile != NULL) {
+        const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+        double tsMs = getLogTimestampMs();
+        fprintf(g_logFile,
+            "[%010.3f ms] REL FACE %d -> %s (front=%s up=%s right=%s) angles(X=%.1f,Y=%.1f)\n",
+            tsMs,
+            relativeFace,
+            faceNames[selected],
+            faceNames[mapping.front],
+            faceNames[mapping.up],
+            faceNames[mapping.right],
+            cameraAngleX,
+            cameraAngleY);
+        fflush(g_logFile);
+    }
+    return selected;
 }
 
 // Main face rotation function
@@ -805,14 +931,17 @@ void rotateFace(int face, bool clockwise) {
     // Log rotation with piece details
     if (g_logFile != NULL) {
         const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
-        fprintf(g_logFile, "ROTATE %s %s: pieces [%d,%d,%d,%d,%d,%d,%d,%d,%d]\n", 
-                faceNames[face], clockwise ? "CW" : "CCW",
-                indices[0], indices[1], indices[2], indices[3], indices[4],
-                indices[5], indices[6], indices[7], indices[8]);
+        double tsMs = getLogTimestampMs();
+        fprintf(g_logFile, "[%010.3f ms] ROTATE %s %s: pieces [%d,%d,%d,%d,%d,%d,%d,%d,%d]\n", 
+            tsMs,
+            faceNames[face], clockwise ? "CW" : "CCW",
+            indices[0], indices[1], indices[2], indices[3], indices[4],
+            indices[5], indices[6], indices[7], indices[8]);
         
         // Log first piece colors after rotation
         CubePiece& p = g_rubikCube.pieces[indices[0]];
-        fprintf(g_logFile, "Piece %d AFTER: F=[%.1f,%.1f,%.1f] B=[%.1f,%.1f,%.1f] L=[%.1f,%.1f,%.1f] R=[%.1f,%.1f,%.1f] U=[%.1f,%.1f,%.1f] D=[%.1f,%.1f,%.1f]\n",
+        fprintf(g_logFile, "[%010.3f ms] Piece %d AFTER: F=[%.1f,%.1f,%.1f] B=[%.1f,%.1f,%.1f] L=[%.1f,%.1f,%.1f] R=[%.1f,%.1f,%.1f] U=[%.1f,%.1f,%.1f] D=[%.1f,%.1f,%.1f]\n",
+            tsMs,
                 indices[0],
                 p.colors[0][0], p.colors[0][1], p.colors[0][2],
                 p.colors[1][0], p.colors[1][1], p.colors[1][2],
@@ -1238,63 +1367,51 @@ void keyboard(unsigned char key, int /* x */, int /* y */) {
         // Face rotation controls (relative to current front face)
         // F/U/R/L/D/B = Front/Up/Right/Left/Down/Back relative to current view
         case 'F': // Front face (relative) clockwise
-            rotateFace(getAbsoluteFace(0), true);  // 0 = F
-            glutPostRedisplay();
+            performRelativeFaceTurn(0, true);  // 0 = F
             return;
             
         case 'G': // Front face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(0), false);  // 0 = F
-            glutPostRedisplay();
+            performRelativeFaceTurn(0, false);  // 0 = F
             return;
             
         case 'U': // Up face (relative) clockwise
-            rotateFace(getAbsoluteFace(1), true);  // 1 = U
-            glutPostRedisplay();
+            performRelativeFaceTurn(1, true);  // 1 = U
             return;
             
         case 'Y': // Up face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(1), false);  // 1 = U
-            glutPostRedisplay();
+            performRelativeFaceTurn(1, false);  // 1 = U
             return;
             
         case 'R': // Right face (relative) clockwise
-            rotateFace(getAbsoluteFace(2), true);  // 2 = R
-            glutPostRedisplay();
+            performRelativeFaceTurn(2, true);  // 2 = R
             return;
             
         case 'I': // Right face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(2), false);  // 2 = R
-            glutPostRedisplay();
+            performRelativeFaceTurn(2, false);  // 2 = R
             return;
             
         case 'L': // Left face (relative) clockwise
-            rotateFace(getAbsoluteFace(3), true);  // 3 = L
-            glutPostRedisplay();
+            performRelativeFaceTurn(3, true);  // 3 = L
             return;
             
         case 'J': // Left face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(3), false);  // 3 = L
-            glutPostRedisplay();
+            performRelativeFaceTurn(3, false);  // 3 = L
             return;
             
         case 'D': // Down face (relative) clockwise
-            rotateFace(getAbsoluteFace(4), true);  // 4 = D
-            glutPostRedisplay();
+            performRelativeFaceTurn(4, true);  // 4 = D
             return;
             
         case 'C': // Down face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(4), false);  // 4 = D
-            glutPostRedisplay();
+            performRelativeFaceTurn(4, false);  // 4 = D
             return;
             
         case 'B': // Back face (relative) clockwise
-            rotateFace(getAbsoluteFace(5), true);  // 5 = B
-            glutPostRedisplay();
+            performRelativeFaceTurn(5, true);  // 5 = B
             return;
             
         case 'V': // Back face (relative) counter-clockwise
-            rotateFace(getAbsoluteFace(5), false);  // 5 = B
-            glutPostRedisplay();
+            performRelativeFaceTurn(5, false);  // 5 = B
             return;
             
         // Camera face selection (lowercase)
@@ -1495,6 +1612,7 @@ int main(int argc, char** argv) {
     glutMotionFunc(motion);
     glutKeyboardFunc(keyboard);      // Register keyboard handler for regular keys (F/R/B/L/U/D)
     glutSpecialFunc(keyboardSpecial); // Register keyboard handler for special keys (arrow keys)
+    glutIgnoreKeyRepeat(1);           // Disable key auto-repeat so each press logs once
     
     // Log initialization complete
     if (g_logFile != NULL) {
