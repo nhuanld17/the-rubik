@@ -1337,6 +1337,8 @@ void motion(int x, int y) {
 
 // Handle regular keyboard input (F/R/B/L/U/D for face selection)
 void keyboard(unsigned char key, int /* x */, int /* y */) {
+    int modifiers = glutGetModifiers();
+    bool shiftDown = (modifiers & GLUT_ACTIVE_SHIFT) != 0;
     int keyUpper = toupper(key);
     Face newFace = currentFrontFace;
     bool faceChanged = false;
@@ -1354,52 +1356,28 @@ void keyboard(unsigned char key, int /* x */, int /* y */) {
             
         // Face rotation controls (relative to current front face)
         // F/U/R/L/D/B = Front/Up/Right/Left/Down/Back relative to current view
-        case 'F': // Front face (relative) clockwise
-            performRelativeFaceTurn(0, true);  // 0 = F
+        case 'F': // Front face (relative)
+            performRelativeFaceTurn(0, !shiftDown);  // Shift => CCW
             return;
             
-        case 'G': // Front face (relative) counter-clockwise
-            performRelativeFaceTurn(0, false);  // 0 = F
+        case 'U': // Up face (relative)
+            performRelativeFaceTurn(1, !shiftDown);
             return;
             
-        case 'U': // Up face (relative) clockwise
-            performRelativeFaceTurn(1, true);  // 1 = U
+        case 'R': // Right face (relative)
+            performRelativeFaceTurn(2, !shiftDown);
             return;
             
-        case 'Y': // Up face (relative) counter-clockwise
-            performRelativeFaceTurn(1, false);  // 1 = U
+        case 'L': // Left face (relative)
+            performRelativeFaceTurn(3, !shiftDown);
             return;
             
-        case 'R': // Right face (relative) clockwise
-            performRelativeFaceTurn(2, true);  // 2 = R
+        case 'D': // Down face (relative)
+            performRelativeFaceTurn(4, !shiftDown);
             return;
             
-        case 'I': // Right face (relative) counter-clockwise
-            performRelativeFaceTurn(2, false);  // 2 = R
-            return;
-            
-        case 'L': // Left face (relative) clockwise
-            performRelativeFaceTurn(3, true);  // 3 = L
-            return;
-            
-        case 'J': // Left face (relative) counter-clockwise
-            performRelativeFaceTurn(3, false);  // 3 = L
-            return;
-            
-        case 'D': // Down face (relative) clockwise
-            performRelativeFaceTurn(4, true);  // 4 = D
-            return;
-            
-        case 'C': // Down face (relative) counter-clockwise
-            performRelativeFaceTurn(4, false);  // 4 = D
-            return;
-            
-        case 'B': // Back face (relative) clockwise
-            performRelativeFaceTurn(5, true);  // 5 = B
-            return;
-            
-        case 'V': // Back face (relative) counter-clockwise
-            performRelativeFaceTurn(5, false);  // 5 = B
+        case 'B': // Back face (relative)
+            performRelativeFaceTurn(5, !shiftDown);
             return;
             
         // Camera face selection (lowercase)
@@ -1435,6 +1413,40 @@ void keyboard(unsigned char key, int /* x */, int /* y */) {
             
         default:
             // Ignore other keys
+            break;
+    }
+    
+    switch (key) {
+        case 'f':
+            newFace = FRONT;
+            faceChanged = true;
+            break;
+            
+        case 'r':
+            newFace = RIGHT;
+            faceChanged = true;
+            break;
+            
+        case 'b':
+            newFace = BACK;
+            faceChanged = true;
+            break;
+            
+        case 'l':
+            newFace = LEFT;
+            faceChanged = true;
+            break;
+            
+        case 'u':
+            newFace = UP;
+            faceChanged = true;
+            break;
+            
+        case 'd':
+            newFace = DOWN;
+            faceChanged = true;
+            break;
+        default:
             break;
     }
     
