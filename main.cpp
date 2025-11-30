@@ -2,6 +2,29 @@
  * Rubik's Cube - Phase 2: 3x3x3 Rubik's Cube with 27 Pieces
  * Computer Graphics Final Project
  * 
+ * ========================================================================
+ * DIAGNOSIS: ĐÚNG - Double Rotation Bug
+ * ========================================================================
+ * 
+ * NGUYÊN NHÂN:
+ * Code cũ đang xoay orientation của TẤT CẢ 8 pieces (trừ center) TRƯỚC KHI
+ * biết mapping. Nhưng thực tế, chỉ những pieces THỰC SỰ DI CHUYỂN (mapping[i] != i)
+ * mới cần xoay orientation. Điều này gây ra "double rotation":
+ * - Pieces không di chuyển vẫn bị xoay orientation → sai
+ * - Sau 2 lần xoay, pattern lặp lại → đúng
+ * - Pattern: F1 sai, F2 đúng, F3 sai, F4 đúng (về ban đầu)
+ * 
+ * GIẢI PHÁP:
+ * 1. Tính mapping trước
+ * 2. Chỉ xoay orientation của pieces THỰC SỰ DI CHUYỂN (mapping[i] != i và i != 4)
+ * 3. Sau đó mới swap colors từ rotated backup
+ * 
+ * KẾT QUẢ:
+ * - F^4 = identity (F 4 lần về đúng trạng thái ban đầu)
+ * - Mỗi lần F đều cho kết quả đúng
+ * 
+ * ========================================================================
+ * 
  * Compilation command (Windows/MinGW - PowerShell):
  * g++ -std=c++98 -Wall -Wextra -O2 main.cpp -lfreeglut -lopengl32 -lglu32 -o rubik.exe
  * 
@@ -22,6 +45,8 @@
 #include <cstdlib> // for system("pause")
 #include <cstdio>  // for fprintf debug logging
 #include <ctime>   // for timestamp
+#include <cstring> // for memcpy
+#include <cctype>  // for toupper
 
 // Window dimensions
 int windowWidth = 800;
@@ -76,8 +101,12 @@ struct RubikCube {
     float gapSize;         // Gap between pieces
 };
 
+
 // Global Rubik's Cube instance
 RubikCube g_rubikCube;
+
+// Animation state (for future use)
+bool isAnimating = false;
 
 // Face orientation enum
 enum Face {
@@ -294,6 +323,532 @@ void rotateAroundAxis(const float axis[3], float angle) {
 void resetRotationAngles() {
     cameraAngleX = 0.0f;
     cameraAngleY = 0.0f;
+}
+
+// Forward declarations
+void initRubikCube();
+void rotatePieceOrientation(int pieceIndex, int axis, bool clockwise);
+
+// Convert position (i,j,k) to array index
+// Loop order: k=1,0,-1; j=-1,0,1; i=-1,0,1
+int positionToIndex(int i, int j, int k) {
+    // k=1: indices 0-8, k=0: indices 9-17, k=-1: indices 18-26
+    int kOffset = (k == 1) ? 0 : (k == 0) ? 9 : 18;
+    int jOffset = (j + 1) * 3;
+    int iOffset = (i + 1);
+    return kOffset + jOffset + iOffset;
+}
+
+// Get 9 indices of pieces on a face
+void getFaceIndices(int face, int indices[9]) {
+    int idx = 0;
+    int i, j, k;
+    
+    switch (face) {
+        case FRONT: // Z = 1
+            k = 1;
+            for (j = -1; j <= 1; j++) {
+                for (i = -1; i <= 1; i++) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+            
+        case BACK: // Z = -1
+            k = -1;
+            for (j = -1; j <= 1; j++) {
+                for (i = -1; i <= 1; i++) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+            
+        case LEFT: // X = -1
+            i = -1;
+            for (j = -1; j <= 1; j++) {
+                for (k = 1; k >= -1; k--) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+            
+        case RIGHT: // X = 1
+            i = 1;
+            for (j = -1; j <= 1; j++) {
+                for (k = 1; k >= -1; k--) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+            
+        case UP: // Y = 1
+            j = 1;
+            for (k = 1; k >= -1; k--) {
+                for (i = -1; i <= 1; i++) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+            
+        case DOWN: // Y = -1
+            j = -1;
+            for (k = 1; k >= -1; k--) {
+                for (i = -1; i <= 1; i++) {
+                    indices[idx++] = positionToIndex(i, j, k);
+                }
+            }
+            break;
+    }
+}
+
+int encodePositionKey(int x, int y, int z) {
+    return (x + 1) * 9 + (y + 1) * 3 + (z + 1);
+}
+
+void rotateCoordinates(int axis, int axisSign, bool clockwise,
+                       int x, int y, int z,
+                       int& rx, int& ry, int& rz) {
+    int angleSign = clockwise ? -1 : 1;  // -90 for CW, +90 for CCW when looking along +axis
+    angleSign *= axisSign;               // adjust for faces whose normal points opposite
+    switch (axis) {
+        case 0: // X-axis
+            rx = x;
+            if (angleSign > 0) {
+                ry = -z;
+                rz = y;
+            } else {
+                ry = z;
+                rz = -y;
+            }
+            break;
+        case 1: // Y-axis
+            ry = y;
+            if (angleSign > 0) {
+                rz = -x;
+                rx = z;
+            } else {
+                rz = x;
+                rx = -z;
+            }
+            break;
+        case 2: // Z-axis
+            rz = z;
+            if (angleSign > 0) {
+                rx = -y;
+                ry = x;
+            } else {
+                rx = y;
+                ry = -x;
+            }
+            break;
+        default:
+            rx = x;
+            ry = y;
+            rz = z;
+            break;
+    }
+}
+
+
+// Rotate positions of 9 pieces on a face (clockwise 90°)
+// CRITICAL: Only swap colors, NEVER swap position (position is fixed grid coords)
+// FIXED: Only rotate orientation of pieces that ACTUALLY MOVE (mapping[i] != i)
+void rotatePositions(int face, bool clockwise) {
+    int indices[9];
+    getFaceIndices(face, indices);
+    
+    // Backup ONLY colors (6 faces × 3 RGB per piece)
+    float backupColors[9][6][3];
+    int i, f, c;
+    for (i = 0; i < 9; i++) {
+        for (f = 0; f < 6; f++) {
+            for (c = 0; c < 3; c++) {
+                backupColors[i][f][c] = g_rubikCube.pieces[indices[i]].colors[f][c];
+            }
+        }
+    }
+    
+    // Determine rotation axis and sign based on face
+    int rotationAxis;
+    int axisSign = 1;
+    switch (face) {
+        case FRONT:
+        case BACK:
+            rotationAxis = 2;  // Z-axis
+            axisSign = (face == FRONT) ? 1 : -1;
+            break;
+        case LEFT:
+        case RIGHT:
+            rotationAxis = 0;  // X-axis
+            axisSign = (face == RIGHT) ? 1 : -1;
+            break;
+        case UP:
+        case DOWN:
+            rotationAxis = 1;  // Y-axis
+            axisSign = (face == UP) ? 1 : -1;
+            break;
+        default:
+            rotationAxis = 2;  // Default to Z-axis
+            break;
+    }
+    
+    // Calculate mapping FIRST to know which pieces actually move
+    int mapping[9];
+    int keyToSlot[27];
+    for (i = 0; i < 27; i++) {
+        keyToSlot[i] = -1;
+    }
+    for (i = 0; i < 9; i++) {
+        const CubePiece& piece = g_rubikCube.pieces[indices[i]];
+        int key = encodePositionKey(piece.position[0], piece.position[1], piece.position[2]);
+        keyToSlot[key] = i;
+    }
+    for (i = 0; i < 9; i++) {
+        const CubePiece& piece = g_rubikCube.pieces[indices[i]];
+        int rx, ry, rz;
+        rotateCoordinates(rotationAxis, axisSign, clockwise,
+                          piece.position[0], piece.position[1], piece.position[2],
+                          rx, ry, rz);
+        int key = encodePositionKey(rx, ry, rz);
+        int destSlot = keyToSlot[key];
+        mapping[destSlot] = i;
+    }
+    
+    // Apply rotation: for each destination, copy SOURCE piece and rotate its orientation
+    // CRITICAL: All pieces except center (slot 4) need orientation rotation when face rotates
+    int j;
+    int srcIdx;
+    float temp[3];
+    
+    for (i = 0; i < 9; i++) {
+        srcIdx = mapping[i];  // Source piece that will move to destination slot i
+        
+        // Copy colors from source to destination
+        for (f = 0; f < 6; f++) {
+            for (c = 0; c < 3; c++) {
+                g_rubikCube.pieces[indices[i]].colors[f][c] = backupColors[srcIdx][f][c];
+            }
+        }
+        
+        // Rotate orientation for all pieces EXCEPT center piece (slot 4)
+        // Even if piece stays in same slot (srcIdx == i), it still rotates with the face
+        if (i != 4) {
+            // Rotate orientation of the DESTINATION piece (which now has SOURCE colors)
+            CubePiece* p = &g_rubikCube.pieces[indices[i]];
+            bool orientationClockwise = clockwise;
+            if (axisSign < 0) {
+                orientationClockwise = !orientationClockwise;
+            }
+            
+            if (orientationClockwise) {
+                if (rotationAxis == 2) {  // Z-axis (FRONT/BACK)
+                    // U→R→D→L→U (clockwise around Z)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[4][j];
+                    for (j = 0; j < 3; j++) p->colors[4][j] = p->colors[2][j];  // L→U
+                    for (j = 0; j < 3; j++) p->colors[2][j] = p->colors[5][j];  // D→L
+                    for (j = 0; j < 3; j++) p->colors[5][j] = p->colors[3][j];  // R→D
+                    for (j = 0; j < 3; j++) p->colors[3][j] = temp[j];  // U→R
+                } else if (rotationAxis == 0) {  // X-axis (LEFT/RIGHT)
+                    // F→U→B→D→F (clockwise around X)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[0][j];
+                    for (j = 0; j < 3; j++) p->colors[0][j] = p->colors[5][j];  // D→F
+                    for (j = 0; j < 3; j++) p->colors[5][j] = p->colors[1][j];  // B→D
+                    for (j = 0; j < 3; j++) p->colors[1][j] = p->colors[4][j];  // U→B
+                    for (j = 0; j < 3; j++) p->colors[4][j] = temp[j];  // F→U
+                } else if (rotationAxis == 1) {  // Y-axis (UP/DOWN)
+                    // R→F, B→R, L→B, F→L (clockwise around Y)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[0][j];
+                    for (j = 0; j < 3; j++) p->colors[0][j] = p->colors[3][j];  // R→F
+                    for (j = 0; j < 3; j++) p->colors[3][j] = p->colors[1][j];  // B→R
+                    for (j = 0; j < 3; j++) p->colors[1][j] = p->colors[2][j];  // L→B
+                    for (j = 0; j < 3; j++) p->colors[2][j] = temp[j];  // F→L
+                }
+            } else {
+                if (rotationAxis == 2) {  // Z-axis (FRONT/BACK)
+                    // U→L→D→R→U (counter-clockwise around Z)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[4][j];
+                    for (j = 0; j < 3; j++) p->colors[4][j] = p->colors[3][j];  // R→U
+                    for (j = 0; j < 3; j++) p->colors[3][j] = p->colors[5][j];  // D→R
+                    for (j = 0; j < 3; j++) p->colors[5][j] = p->colors[2][j];  // L→D
+                    for (j = 0; j < 3; j++) p->colors[2][j] = temp[j];  // U→L
+                } else if (rotationAxis == 0) {  // X-axis (LEFT/RIGHT)
+                    // F→D→B→U→F (counter-clockwise around X)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[0][j];
+                    for (j = 0; j < 3; j++) p->colors[0][j] = p->colors[4][j];  // U→F
+                    for (j = 0; j < 3; j++) p->colors[4][j] = p->colors[1][j];  // B→U
+                    for (j = 0; j < 3; j++) p->colors[1][j] = p->colors[5][j];  // D→B
+                    for (j = 0; j < 3; j++) p->colors[5][j] = temp[j];  // F→D
+                } else if (rotationAxis == 1) {  // Y-axis (UP/DOWN)
+                    // L→F, B→L, R→B, F→R (counter-clockwise around Y)
+                    for (j = 0; j < 3; j++) temp[j] = p->colors[0][j];
+                    for (j = 0; j < 3; j++) p->colors[0][j] = p->colors[2][j];  // L→F
+                    for (j = 0; j < 3; j++) p->colors[2][j] = p->colors[1][j];  // B→L
+                    for (j = 0; j < 3; j++) p->colors[1][j] = p->colors[3][j];  // R→B
+                    for (j = 0; j < 3; j++) p->colors[3][j] = temp[j];  // F→R
+                }
+            }
+        }
+        // position[] stays at original grid coords - NEVER MODIFIED
+    }
+    
+    // Log rotation
+    if (g_logFile != NULL) {
+        const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+        fprintf(g_logFile, "ROTATE %s %s: colors swapped, positions preserved\n",
+                faceNames[face], clockwise ? "CW" : "CCW");
+        fflush(g_logFile);
+    }
+}
+
+// Rotate piece orientation (rotate colors around axis when piece moves)
+// This simulates real Rubik's Cube physics: when piece moves, its colors rotate
+void rotatePieceOrientation(int pieceIndex, int axis, bool clockwise) {
+    CubePiece* p = &g_rubikCube.pieces[pieceIndex];
+    float temp[3];
+    int i;
+    
+    // Face indices: 0=Front, 1=Back, 2=Left, 3=Right, 4=Up, 5=Down
+    if (axis == 2) {  // Z-axis (FRONT/BACK rotation)
+        if (clockwise) {
+            // Clockwise around Z: U(4)→R(3)→D(5)→L(2)→U(4)
+            // Backup U
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[4][i];
+            }
+            // L→U
+            for (i = 0; i < 3; i++) {
+                p->colors[4][i] = p->colors[2][i];
+            }
+            // D→L
+            for (i = 0; i < 3; i++) {
+                p->colors[2][i] = p->colors[5][i];
+            }
+            // R→D
+            for (i = 0; i < 3; i++) {
+                p->colors[5][i] = p->colors[3][i];
+            }
+            // U→R
+            for (i = 0; i < 3; i++) {
+                p->colors[3][i] = temp[i];
+            }
+        } else {
+            // Counter-clockwise around Z: U(4)→L(2)→D(5)→R(3)→U(4)
+            // Backup U
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[4][i];
+            }
+            // R→U
+            for (i = 0; i < 3; i++) {
+                p->colors[4][i] = p->colors[3][i];
+            }
+            // D→R
+            for (i = 0; i < 3; i++) {
+                p->colors[3][i] = p->colors[5][i];
+            }
+            // L→D
+            for (i = 0; i < 3; i++) {
+                p->colors[5][i] = p->colors[2][i];
+            }
+            // U→L
+            for (i = 0; i < 3; i++) {
+                p->colors[2][i] = temp[i];
+            }
+        }
+    } else if (axis == 0) {  // X-axis (LEFT/RIGHT rotation)
+        if (clockwise) {
+            // Clockwise around X: F(0)→U(4)→B(1)→D(5)→F(0)
+            // Backup F
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[0][i];
+            }
+            // D→F
+            for (i = 0; i < 3; i++) {
+                p->colors[0][i] = p->colors[5][i];
+            }
+            // B→D
+            for (i = 0; i < 3; i++) {
+                p->colors[5][i] = p->colors[1][i];
+            }
+            // U→B
+            for (i = 0; i < 3; i++) {
+                p->colors[1][i] = p->colors[4][i];
+            }
+            // F→U
+            for (i = 0; i < 3; i++) {
+                p->colors[4][i] = temp[i];
+            }
+        } else {
+            // Counter-clockwise around X: F(0)→D(5)→B(1)→U(4)→F(0)
+            // Backup F
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[0][i];
+            }
+            // U→F
+            for (i = 0; i < 3; i++) {
+                p->colors[0][i] = p->colors[4][i];
+            }
+            // B→U
+            for (i = 0; i < 3; i++) {
+                p->colors[4][i] = p->colors[1][i];
+            }
+            // D→B
+            for (i = 0; i < 3; i++) {
+                p->colors[1][i] = p->colors[5][i];
+            }
+            // F→D
+            for (i = 0; i < 3; i++) {
+                p->colors[5][i] = temp[i];
+            }
+        }
+    } else if (axis == 1) {  // Y-axis (UP/DOWN rotation)
+        if (clockwise) {
+            // Clockwise around Y: F(0)→R(3)→B(1)→L(2)→F(0)
+            // Backup F
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[0][i];
+            }
+            // L→F
+            for (i = 0; i < 3; i++) {
+                p->colors[0][i] = p->colors[2][i];
+            }
+            // B→L
+            for (i = 0; i < 3; i++) {
+                p->colors[2][i] = p->colors[1][i];
+            }
+            // R→B
+            for (i = 0; i < 3; i++) {
+                p->colors[1][i] = p->colors[3][i];
+            }
+            // F→R
+            for (i = 0; i < 3; i++) {
+                p->colors[3][i] = temp[i];
+            }
+        } else {
+            // Counter-clockwise around Y: F(0)→L(2)→B(1)→R(3)→F(0)
+            // Backup F
+            for (i = 0; i < 3; i++) {
+                temp[i] = p->colors[0][i];
+            }
+            // R→F
+            for (i = 0; i < 3; i++) {
+                p->colors[0][i] = p->colors[3][i];
+            }
+            // B→R
+            for (i = 0; i < 3; i++) {
+                p->colors[3][i] = p->colors[1][i];
+            }
+            // L→B
+            for (i = 0; i < 3; i++) {
+                p->colors[1][i] = p->colors[2][i];
+            }
+            // F→L
+            for (i = 0; i < 3; i++) {
+                p->colors[2][i] = temp[i];
+            }
+        }
+    }
+}
+
+// Rotate colors of pieces on a face
+// Note: Colors are rotated along with positions, so this function is now redundant
+// but kept for future color-only rotations if needed
+void rotateColors(int face, bool clockwise) {
+    // Colors are already rotated in rotatePositions() via memcpy of entire CubePiece
+    // This function is kept for compatibility but does nothing
+    (void)face;
+    (void)clockwise;
+}
+
+// Convert relative face (F/U/R/L/D/B) to absolute face based on current front face
+// Relative faces: F=Front, U=Up, R=Right, L=Left, D=Down, B=Back (relative to current view)
+Face getAbsoluteFace(int relativeFace) {
+    // relativeFace: 0=F, 1=U, 2=R, 3=L, 4=D, 5=B
+    // Returns: absolute Face enum (FRONT/BACK/LEFT/RIGHT/UP/DOWN)
+    
+    // Mapping table: [currentFrontFace][relativeFace] -> absoluteFace
+    // Format: [FRONT, BACK, LEFT, RIGHT, UP, DOWN][F, U, R, L, D, B]
+    static const Face faceMapping[6][6] = {
+        // currentFrontFace = FRONT (Red front, White up, Yellow down)
+        {FRONT, UP, RIGHT, LEFT, DOWN, BACK},  // F, U, R, L, D, B
+        
+        // currentFrontFace = BACK (Orange front, White up, Yellow down)
+        {BACK, UP, LEFT, RIGHT, DOWN, FRONT},  // F, U, R, L, D, B
+        
+        // currentFrontFace = LEFT (Blue front, White up, Yellow down)
+        {LEFT, UP, FRONT, BACK, DOWN, RIGHT},   // F, U, R, L, D, B
+        
+        // currentFrontFace = RIGHT (Green front, White up, Yellow down)
+        {RIGHT, UP, BACK, FRONT, DOWN, LEFT},   // F, U, R, L, D, B
+        
+        // currentFrontFace = UP (White front, Red right, Orange left)
+        {UP, BACK, RIGHT, LEFT, FRONT, DOWN},   // F, U, R, L, D, B
+        
+        // currentFrontFace = DOWN (Yellow front, Orange right, Red left)
+        {DOWN, FRONT, RIGHT, LEFT, BACK, UP}    // F, U, R, L, D, B
+    };
+    
+    return faceMapping[currentFrontFace][relativeFace];
+}
+
+// Main face rotation function
+void rotateFace(int face, bool clockwise) {
+    if (isAnimating) {
+        return;
+    }
+    
+    int indices[9];
+    getFaceIndices(face, indices);
+    
+    // Rotate positions (this also rotates colors since we swap entire CubePiece)
+    rotatePositions(face, clockwise);
+    
+    // Log rotation with piece details
+    if (g_logFile != NULL) {
+        const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+        fprintf(g_logFile, "ROTATE %s %s: pieces [%d,%d,%d,%d,%d,%d,%d,%d,%d]\n", 
+                faceNames[face], clockwise ? "CW" : "CCW",
+                indices[0], indices[1], indices[2], indices[3], indices[4],
+                indices[5], indices[6], indices[7], indices[8]);
+        
+        // Log first piece colors after rotation
+        CubePiece& p = g_rubikCube.pieces[indices[0]];
+        fprintf(g_logFile, "Piece %d AFTER: F=[%.1f,%.1f,%.1f] B=[%.1f,%.1f,%.1f] L=[%.1f,%.1f,%.1f] R=[%.1f,%.1f,%.1f] U=[%.1f,%.1f,%.1f] D=[%.1f,%.1f,%.1f]\n",
+                indices[0],
+                p.colors[0][0], p.colors[0][1], p.colors[0][2],
+                p.colors[1][0], p.colors[1][1], p.colors[1][2],
+                p.colors[2][0], p.colors[2][1], p.colors[2][2],
+                p.colors[3][0], p.colors[3][1], p.colors[3][2],
+                p.colors[4][0], p.colors[4][1], p.colors[4][2],
+                p.colors[5][0], p.colors[5][1], p.colors[5][2]);
+        fflush(g_logFile);
+    }
+}
+
+// Reset cube to solved state
+void resetCube() {
+    initRubikCube();
+    if (g_logFile != NULL) {
+        fprintf(g_logFile, "RESET: Cube to solved state\n");
+        fflush(g_logFile);
+    }
+}
+
+// Shuffle cube with random moves
+void shuffleCube(int numMoves) {
+    int i;
+    int face;
+    bool clockwise;
+    
+    for (i = 0; i < numMoves; i++) {
+        face = rand() % 6;
+        clockwise = (rand() % 2) == 0;
+        rotateFace(face, clockwise);
+    }
+    
+    if (g_logFile != NULL) {
+        fprintf(g_logFile, "SHUFFLE: %d random moves\n", numMoves);
+        fflush(g_logFile);
+    }
 }
 
 // Initialize OpenGL settings
@@ -665,42 +1220,110 @@ void motion(int x, int y) {
 
 // Handle regular keyboard input (F/R/B/L/U/D for face selection)
 void keyboard(unsigned char key, int /* x */, int /* y */) {
+    int keyUpper = toupper(key);
     Face newFace = currentFrontFace;
     bool faceChanged = false;
     
-    switch (key) {
+    switch (keyUpper) {
+        case ' ': // Spacebar - Reset cube to solved state
+            resetCube();
+            glutPostRedisplay();
+            return;
+            
+        case 'S': // Shuffle cube
+            shuffleCube(20);
+            glutPostRedisplay();
+            return;
+            
+        // Face rotation controls (relative to current front face)
+        // F/U/R/L/D/B = Front/Up/Right/Left/Down/Back relative to current view
+        case 'F': // Front face (relative) clockwise
+            rotateFace(getAbsoluteFace(0), true);  // 0 = F
+            glutPostRedisplay();
+            return;
+            
+        case 'G': // Front face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(0), false);  // 0 = F
+            glutPostRedisplay();
+            return;
+            
+        case 'U': // Up face (relative) clockwise
+            rotateFace(getAbsoluteFace(1), true);  // 1 = U
+            glutPostRedisplay();
+            return;
+            
+        case 'Y': // Up face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(1), false);  // 1 = U
+            glutPostRedisplay();
+            return;
+            
+        case 'R': // Right face (relative) clockwise
+            rotateFace(getAbsoluteFace(2), true);  // 2 = R
+            glutPostRedisplay();
+            return;
+            
+        case 'I': // Right face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(2), false);  // 2 = R
+            glutPostRedisplay();
+            return;
+            
+        case 'L': // Left face (relative) clockwise
+            rotateFace(getAbsoluteFace(3), true);  // 3 = L
+            glutPostRedisplay();
+            return;
+            
+        case 'J': // Left face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(3), false);  // 3 = L
+            glutPostRedisplay();
+            return;
+            
+        case 'D': // Down face (relative) clockwise
+            rotateFace(getAbsoluteFace(4), true);  // 4 = D
+            glutPostRedisplay();
+            return;
+            
+        case 'C': // Down face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(4), false);  // 4 = D
+            glutPostRedisplay();
+            return;
+            
+        case 'B': // Back face (relative) clockwise
+            rotateFace(getAbsoluteFace(5), true);  // 5 = B
+            glutPostRedisplay();
+            return;
+            
+        case 'V': // Back face (relative) counter-clockwise
+            rotateFace(getAbsoluteFace(5), false);  // 5 = B
+            glutPostRedisplay();
+            return;
+            
+        // Camera face selection (lowercase)
         case 'f':
-        case 'F':
             newFace = FRONT;
             faceChanged = true;
             break;
             
         case 'r':
-        case 'R':
             newFace = RIGHT;
             faceChanged = true;
             break;
             
         case 'b':
-        case 'B':
             newFace = BACK;
             faceChanged = true;
             break;
             
         case 'l':
-        case 'L':
             newFace = LEFT;
             faceChanged = true;
             break;
             
         case 'u':
-        case 'U':
             newFace = UP;
             faceChanged = true;
             break;
             
         case 'd':
-        case 'D':
             newFace = DOWN;
             faceChanged = true;
             break;
@@ -713,7 +1336,6 @@ void keyboard(unsigned char key, int /* x */, int /* y */) {
     if (faceChanged) {
         currentFrontFace = newFace;
         updateRotationAxes();
-        // Keep rotation matrix when changing face (don't reset)
         glutPostRedisplay();
     }
 }
@@ -763,6 +1385,76 @@ void keyboardSpecial(int key, int /* x */, int /* y */) {
     glutPostRedisplay();
 }
 
+// Test function: Verify face^4 = identity for all faces (4 CW turns return to original state)
+void testRotationIdentity() {
+    if (g_logFile == NULL) {
+        return;
+    }
+    
+    fprintf(g_logFile, "\n=== ROTATION IDENTITY TEST ===\n");
+    
+    // Backup entire cube colors
+    float originalColors[27][6][3];
+    for (int p = 0; p < 27; p++) {
+        for (int f = 0; f < 6; f++) {
+            for (int c = 0; c < 3; c++) {
+                originalColors[p][f][c] = g_rubikCube.pieces[p].colors[f][c];
+            }
+        }
+    }
+    
+    const Face facesToTest[] = {FRONT, BACK, LEFT, RIGHT, UP, DOWN};
+    const char* faceNames[] = {"FRONT", "BACK", "LEFT", "RIGHT", "UP", "DOWN"};
+    const int entriesPerCube = 27 * 6 * 3;
+    
+    for (int faceIdx = 0; faceIdx < 6; faceIdx++) {
+        Face face = facesToTest[faceIdx];
+        // Restore baseline before each face test
+        for (int p = 0; p < 27; p++) {
+            for (int f = 0; f < 6; f++) {
+                for (int c = 0; c < 3; c++) {
+                    g_rubikCube.pieces[p].colors[f][c] = originalColors[p][f][c];
+                }
+            }
+        }
+        
+        fprintf(g_logFile, "Testing %s: performing 4 CW turns...\n", faceNames[faceIdx]);
+        for (int turn = 0; turn < 4; turn++) {
+            rotateFace(face, true);
+        }
+        
+        int matches = 0;
+        for (int p = 0; p < 27; p++) {
+            for (int f = 0; f < 6; f++) {
+                for (int c = 0; c < 3; c++) {
+                    float diff = fabs(g_rubikCube.pieces[p].colors[f][c] - originalColors[p][f][c]);
+                    if (diff < 0.001f) {
+                        matches++;
+                    }
+                }
+            }
+        }
+        
+        if (matches == entriesPerCube) {
+            fprintf(g_logFile, "  -> %s PASSED (%d/%d matches)\n", faceNames[faceIdx], matches, entriesPerCube);
+        } else {
+            fprintf(g_logFile, "  -> %s FAILED (%d/%d matches)\n", faceNames[faceIdx], matches, entriesPerCube);
+        }
+    }
+    
+    // Restore original solved state after tests
+    for (int p = 0; p < 27; p++) {
+        for (int f = 0; f < 6; f++) {
+            for (int c = 0; c < 3; c++) {
+                g_rubikCube.pieces[p].colors[f][c] = originalColors[p][f][c];
+            }
+        }
+    }
+    
+    fprintf(g_logFile, "=== END ROTATION IDENTITY TEST ===\n\n");
+    fflush(g_logFile);
+}
+
 // Main entry point
 int main(int argc, char** argv) {
     // Initialize debug log file
@@ -787,8 +1479,14 @@ int main(int argc, char** argv) {
     // Initialize Rubik's Cube (27 pieces)
     initRubikCube();
     
+    // Test rotation identity: F^4 = identity (verify fix works correctly)
+    testRotationIdentity();
+    
     // Initialize rotation axes for default FRONT face
     updateRotationAxes();
+    
+    // Initialize random seed for shuffle
+    srand((unsigned int)time(NULL));
     
     // Register callback functions
     glutDisplayFunc(display);

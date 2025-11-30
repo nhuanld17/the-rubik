@@ -1,658 +1,334 @@
 === Rubik's Cube Debug Log ===
-Started: 2025-11-29 16:35:28
+Started: 2025-11-30 12:05:40
 ==============================
 
 Phase 2: Initialized 27 Rubik pieces
 Piece 0: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+
+=== ROTATION IDENTITY TEST ===
+Testing FRONT: performing 4 CW turns...
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[1.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,1.0,0.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[1.0,1.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,0.0,1.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+  -> FRONT PASSED (486/486 matches)
+Testing BACK: performing 4 CW turns...
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[1.0,1.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,0.0,1.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[1.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,1.0,0.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+  -> BACK PASSED (486/486 matches)
+Testing LEFT: performing 4 CW turns...
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,1.0,1.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,0.0,0.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,1.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,0.5,0.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+  -> LEFT PASSED (486/486 matches)
+Testing RIGHT: performing 4 CW turns...
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,1.0,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,0.5,0.0]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,1.0,1.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,0.0,0.0]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+  -> RIGHT PASSED (486/486 matches)
+Testing UP: performing 4 CW turns...
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[0.0,1.0,0.0] B=[0.1,0.1,0.1] L=[1.0,0.0,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[0.0,0.0,1.0] B=[0.1,0.1,0.1] L=[1.0,0.5,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+  -> UP PASSED (486/486 matches)
+Testing DOWN: performing 4 CW turns...
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,0.0,1.0] B=[0.1,0.1,0.1] L=[1.0,0.5,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,1.0,0.0] B=[0.1,0.1,0.1] L=[1.0,0.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+  -> DOWN PASSED (486/486 matches)
+=== END ROTATION IDENTITY TEST ===
+
 FACE CHANGE: FRONT | verticalAxis=[1.0,0.0,0.0] horizontalAxis=[0.0,1.0,0.0]
 Application initialized successfully
 
 DISPLAY: frame=1
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=5.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=10.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=15.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=20.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=25.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=30.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=35.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=40.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=45.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=50.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=55.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=60.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=65.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=70.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=75.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=80.0
-KEYBOARD: RIGHT pressed | angleX=0.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-5.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-10.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-15.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-20.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-25.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-30.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-35.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-40.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-45.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-50.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-55.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-60.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-65.0 angleY=85.0
+KEYBOARD: DOWN pressed | angleX=5.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=10.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=15.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=20.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=25.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=30.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=35.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=40.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=45.0 angleY=0.0
+KEYBOARD: DOWN pressed | angleX=50.0 angleY=0.0
+KEYBOARD: LEFT pressed | angleX=50.0 angleY=-5.0
+KEYBOARD: UP pressed | angleX=45.0 angleY=-5.0
+KEYBOARD: UP pressed | angleX=40.0 angleY=-5.0
+KEYBOARD: LEFT pressed | angleX=40.0 angleY=-10.0
+KEYBOARD: LEFT pressed | angleX=40.0 angleY=-15.0
+KEYBOARD: LEFT pressed | angleX=40.0 angleY=-20.0
+KEYBOARD: UP pressed | angleX=35.0 angleY=-20.0
+KEYBOARD: LEFT pressed | angleX=35.0 angleY=-25.0
+KEYBOARD: UP pressed | angleX=30.0 angleY=-25.0
+KEYBOARD: UP pressed | angleX=25.0 angleY=-25.0
+KEYBOARD: LEFT pressed | angleX=25.0 angleY=-30.0
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[1.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,1.0,0.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[1.0,1.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,0.0,1.0]
+ROTATE FRONT CW: colors swapped, positions preserved
+ROTATE FRONT CW: pieces [0,1,2,3,4,5,6,7,8]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[0.0,1.0,0.0] B=[0.1,0.1,0.1] L=[1.0,0.0,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[0.0,0.0,1.0] B=[0.1,0.1,0.1] L=[1.0,0.5,0.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE UP CW: colors swapped, positions preserved
+ROTATE UP CW: pieces [6,7,8,15,16,17,24,25,26]
+Piece 6 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[1.0,1.0,1.0] D=[0.1,0.1,0.1]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,1.0,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,0.5,0.0]
 DISPLAY: frame=31
-KEYBOARD: UP pressed | angleX=-70.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-75.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-80.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-85.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-90.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-95.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-100.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-105.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-110.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-115.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-120.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-125.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-130.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-135.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-140.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-145.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-150.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-155.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-160.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-165.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-170.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-175.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-180.0 angleY=85.0
-KEYBOARD: UP pressed | angleX=-185.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-180.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-175.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-170.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-165.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-160.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-155.0 angleY=85.0
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,1.0,1.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,0.0,0.0]
+ROTATE RIGHT CW: colors swapped, positions preserved
+ROTATE RIGHT CW: pieces [2,11,20,5,14,23,8,17,26]
+Piece 2 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.1,0.1,0.1] R=[0.0,1.0,0.0] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=-25.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=-20.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=-15.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=-10.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=-5.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=0.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=5.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=10.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=15.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=20.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=25.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=30.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=35.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=40.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=45.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=50.0
+KEYBOARD: RIGHT pressed | angleX=25.0 angleY=55.0
+KEYBOARD: LEFT pressed | angleX=25.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=30.0 angleY=50.0
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,1.0,1.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,0.0,0.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,1.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,0.5,0.0]
+ROTATE LEFT CW: colors swapped, positions preserved
+ROTATE LEFT CW: pieces [0,9,18,3,12,21,6,15,24]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+KEYBOARD: UP pressed | angleX=25.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=20.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=15.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=10.0 angleY=50.0
 DISPLAY: frame=61
-KEYBOARD: DOWN pressed | angleX=-150.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-145.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-140.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-135.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-130.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-125.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-120.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-115.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-110.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-105.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-100.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-95.0 angleY=85.0
-KEYBOARD: DOWN pressed | angleX=-90.0 angleY=85.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=80.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=75.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=70.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=65.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=60.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=55.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=50.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=45.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=40.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=35.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=30.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=25.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=20.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=15.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=10.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=5.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=0.0
+KEYBOARD: UP pressed | angleX=5.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=0.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-5.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-10.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-15.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-20.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-25.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-30.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-35.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-40.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=-45.0 angleY=50.0
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,0.0,1.0] B=[0.1,0.1,0.1] L=[1.0,0.5,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,1.0,0.0] B=[0.1,0.1,0.1] L=[1.0,0.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,0.0,1.0] B=[0.1,0.1,0.1] L=[1.0,0.5,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.5,0.0] B=[0.1,0.1,0.1] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[0.0,1.0,0.0] B=[0.1,0.1,0.1] L=[1.0,0.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+ROTATE DOWN CW: colors swapped, positions preserved
+ROTATE DOWN CW: pieces [0,1,2,9,10,11,18,19,20]
+Piece 0 AFTER: F=[1.0,0.0,0.0] B=[0.1,0.1,0.1] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+KEYBOARD: DOWN pressed | angleX=-40.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-35.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-30.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-25.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-20.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-15.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-10.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=-5.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=0.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=5.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=10.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=15.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=20.0 angleY=50.0
 DISPLAY: frame=91
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=-5.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=-10.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=-15.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=-20.0
-KEYBOARD: LEFT pressed | angleX=-90.0 angleY=-25.0
-KEYBOARD: UP pressed | angleX=-95.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-90.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-85.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-80.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-75.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-70.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-65.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-60.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-55.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-50.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-45.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-40.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-35.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-30.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-25.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-20.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-15.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-10.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=-5.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=0.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=5.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=10.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=15.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=20.0 angleY=-25.0
-KEYBOARD: DOWN pressed | angleX=25.0 angleY=-25.0
+KEYBOARD: DOWN pressed | angleX=25.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=30.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=35.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=40.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=45.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=50.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=55.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=60.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=65.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=70.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=75.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=80.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=85.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=90.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=95.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=100.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=105.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=110.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=115.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=120.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=125.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=130.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=135.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=140.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=145.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=150.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=155.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=160.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=165.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=170.0 angleY=50.0
 DISPLAY: frame=121
-KEYBOARD: DOWN pressed | angleX=30.0 angleY=-25.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=-20.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=-15.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=-10.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=-5.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=0.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=5.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=10.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=15.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=20.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=25.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=30.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=35.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=40.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=45.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=50.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=55.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=60.0
-KEYBOARD: RIGHT pressed | angleX=30.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=25.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=20.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=15.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=10.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=5.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=0.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-5.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-10.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-15.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-20.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-25.0 angleY=65.0
+KEYBOARD: DOWN pressed | angleX=175.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=170.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=165.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=160.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=155.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=150.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=145.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=140.0 angleY=50.0
+KEYBOARD: UP pressed | angleX=135.0 angleY=50.0
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[1.0,1.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,0.0,1.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[0.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,1.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[1.0,1.0,0.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[0.0,1.0,0.0]
+ROTATE BACK CW: colors swapped, positions preserved
+ROTATE BACK CW: pieces [18,19,20,21,22,23,24,25,26]
+Piece 18 AFTER: F=[0.1,0.1,0.1] B=[1.0,0.5,0.0] L=[0.0,0.0,1.0] R=[0.1,0.1,0.1] U=[0.1,0.1,0.1] D=[1.0,1.0,0.0]
+KEYBOARD: DOWN pressed | angleX=140.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=145.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=150.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=155.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=160.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=165.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=170.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=175.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=180.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=185.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=190.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=195.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=200.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=205.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=210.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=215.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=220.0 angleY=50.0
 DISPLAY: frame=151
-KEYBOARD: UP pressed | angleX=-30.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-35.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-40.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-45.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-50.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-55.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-60.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-65.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=-70.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-65.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-60.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-55.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-50.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-45.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-40.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-35.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-30.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-25.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-20.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-15.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-10.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=-5.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=0.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=5.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=10.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=15.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=20.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=25.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=30.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=35.0 angleY=65.0
-DISPLAY: frame=181
-KEYBOARD: DOWN pressed | angleX=40.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=45.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=50.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=55.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=60.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=65.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=70.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=75.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=80.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=85.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=90.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=95.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=100.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=105.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=110.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=115.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=120.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=125.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=130.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=135.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=140.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=145.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=150.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=155.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=160.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=165.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=170.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=175.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=180.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=185.0 angleY=65.0
-DISPLAY: frame=211
-KEYBOARD: DOWN pressed | angleX=190.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=195.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=200.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=205.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=210.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=215.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=220.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=225.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=230.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=235.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=240.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=245.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=250.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=255.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=260.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=265.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=270.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=275.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=280.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=285.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=290.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=295.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=300.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=305.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=310.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=315.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=320.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=325.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=330.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=335.0 angleY=65.0
-DISPLAY: frame=241
-KEYBOARD: DOWN pressed | angleX=340.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=345.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=350.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=355.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=360.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=365.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=370.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=375.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=380.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=385.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=390.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=395.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=400.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=405.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=410.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=415.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=420.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=425.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=430.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=435.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=430.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=425.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=420.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=415.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=410.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=405.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=400.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=395.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=400.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=405.0 angleY=65.0
-DISPLAY: frame=271
-KEYBOARD: DOWN pressed | angleX=410.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=415.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=420.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=425.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=430.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=435.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=440.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=445.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=450.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=455.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=460.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=465.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=470.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=475.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=480.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=485.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=490.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=495.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=500.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=505.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=510.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=515.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=520.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=525.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=530.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=535.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=540.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=545.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=550.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=555.0 angleY=65.0
-DISPLAY: frame=301
-KEYBOARD: DOWN pressed | angleX=560.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=565.0 angleY=65.0
-KEYBOARD: DOWN pressed | angleX=570.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=565.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=560.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=555.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=550.0 angleY=65.0
-KEYBOARD: UP pressed | angleX=545.0 angleY=65.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=70.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=75.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=80.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=85.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=90.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=95.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=100.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=105.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=110.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=115.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=120.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=125.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=130.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=135.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=140.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=145.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=150.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=155.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=160.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=165.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=170.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=175.0
-DISPLAY: frame=331
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=180.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=185.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=190.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=195.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=200.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=205.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=210.0
-KEYBOARD: RIGHT pressed | angleX=545.0 angleY=215.0
-KEYBOARD: DOWN pressed | angleX=550.0 angleY=215.0
-KEYBOARD: DOWN pressed | angleX=555.0 angleY=215.0
-KEYBOARD: UP pressed | angleX=550.0 angleY=215.0
-KEYBOARD: UP pressed | angleX=545.0 angleY=215.0
-KEYBOARD: UP pressed | angleX=540.0 angleY=215.0
-KEYBOARD: UP pressed | angleX=535.0 angleY=215.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=210.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=205.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=200.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=195.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=190.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=185.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=180.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=175.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=170.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=165.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=160.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=155.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=150.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=145.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=140.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=135.0
-DISPLAY: frame=361
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=130.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=125.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=120.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=115.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=110.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=105.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=100.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=95.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=90.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=85.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=80.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=75.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=70.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=65.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=60.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=55.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=50.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=45.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=40.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=35.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=30.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=25.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=20.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=15.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=10.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=5.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=0.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-5.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-10.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-15.0
-DISPLAY: frame=391
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-20.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-25.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-30.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-35.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-40.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-45.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-50.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-55.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-60.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-65.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-70.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-75.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-80.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-85.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-90.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-95.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-100.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-105.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-110.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-115.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-120.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-125.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-130.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-135.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-140.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-145.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-150.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-155.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-160.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-165.0
-DISPLAY: frame=421
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-170.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-175.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-180.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-185.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-190.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-195.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-200.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-205.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-210.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-215.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-220.0
-KEYBOARD: LEFT pressed | angleX=535.0 angleY=-225.0
-KEYBOARD: DOWN pressed | angleX=540.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=535.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=530.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=525.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=520.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=515.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=510.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=505.0 angleY=-225.0
-KEYBOARD: UP pressed | angleX=500.0 angleY=-225.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-220.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-215.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-210.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-205.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-200.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-195.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-190.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-185.0
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-180.0
-DISPLAY: frame=451
-KEYBOARD: RIGHT pressed | angleX=500.0 angleY=-175.0
-KEYBOARD: LEFT pressed | angleX=500.0 angleY=-180.0
-KEYBOARD: LEFT pressed | angleX=500.0 angleY=-185.0
-KEYBOARD: LEFT pressed | angleX=500.0 angleY=-190.0
-KEYBOARD: UP pressed | angleX=495.0 angleY=-190.0
-KEYBOARD: UP pressed | angleX=490.0 angleY=-190.0
-KEYBOARD: DOWN pressed | angleX=495.0 angleY=-190.0
-KEYBOARD: DOWN pressed | angleX=500.0 angleY=-190.0
-KEYBOARD: DOWN pressed | angleX=505.0 angleY=-190.0
-KEYBOARD: DOWN pressed | angleX=510.0 angleY=-190.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-185.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-190.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-195.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-200.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-205.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-210.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-205.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-200.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-195.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-190.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-185.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-180.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-175.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-170.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-165.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-160.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-155.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-150.0
-KEYBOARD: RIGHT pressed | angleX=510.0 angleY=-145.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-150.0
-DISPLAY: frame=481
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-155.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-160.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-165.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-170.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-175.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-180.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-185.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-190.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-195.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-200.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-205.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-210.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-215.0
-KEYBOARD: LEFT pressed | angleX=510.0 angleY=-220.0
-KEYBOARD: UP pressed | angleX=505.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=510.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=515.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=520.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=525.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=530.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=535.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=540.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=545.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=550.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=555.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=560.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=565.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=570.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=575.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=580.0 angleY=-220.0
-DISPLAY: frame=511
-KEYBOARD: DOWN pressed | angleX=585.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=590.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=595.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=600.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=605.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=610.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=615.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=620.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=625.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=630.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=635.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=640.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=645.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=650.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=655.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=660.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=665.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=670.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=675.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=680.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=685.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=690.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=695.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=700.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=705.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=710.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=715.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=720.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=725.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=730.0 angleY=-220.0
-DISPLAY: frame=541
-KEYBOARD: DOWN pressed | angleX=735.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=740.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=745.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=750.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=755.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=760.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=765.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=770.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=775.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=780.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=785.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=790.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=795.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=800.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=805.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=810.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=815.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=820.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=825.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=830.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=835.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=840.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=845.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=850.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=855.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=860.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=865.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=870.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=875.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=880.0 angleY=-220.0
-DISPLAY: frame=571
-KEYBOARD: DOWN pressed | angleX=885.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=890.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=895.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=900.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=905.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=910.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=915.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=920.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=925.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=930.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=935.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=940.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=945.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=950.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=955.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=960.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=965.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=970.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=975.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=980.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=985.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=990.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=995.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=1000.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=1005.0 angleY=-220.0
-KEYBOARD: DOWN pressed | angleX=1010.0 angleY=-220.0
-KEYBOARD: UP pressed | angleX=1005.0 angleY=-220.0
-KEYBOARD: UP pressed | angleX=1000.0 angleY=-220.0
-KEYBOARD: UP pressed | angleX=995.0 angleY=-220.0
-KEYBOARD: UP pressed | angleX=990.0 angleY=-220.0
-DISPLAY: frame=601
-KEYBOARD: UP pressed | angleX=985.0 angleY=-220.0
-KEYBOARD: RIGHT pressed | angleX=985.0 angleY=-215.0
-KEYBOARD: RIGHT pressed | angleX=985.0 angleY=-210.0
-KEYBOARD: RIGHT pressed | angleX=985.0 angleY=-205.0
-KEYBOARD: DOWN pressed | angleX=990.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=985.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=980.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=975.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=970.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=965.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=960.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=955.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=950.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=945.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=940.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=935.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=930.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=925.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=920.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=915.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=910.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=905.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=900.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=895.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=890.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=885.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=880.0 angleY=-205.0
-KEYBOARD: UP pressed | angleX=875.0 angleY=-205.0
+KEYBOARD: DOWN pressed | angleX=225.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=230.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=235.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=240.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=245.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=250.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=255.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=260.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=265.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=270.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=275.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=280.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=285.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=290.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=295.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=300.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=305.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=310.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=315.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=320.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=325.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=330.0 angleY=50.0
+KEYBOARD: DOWN pressed | angleX=335.0 angleY=50.0
